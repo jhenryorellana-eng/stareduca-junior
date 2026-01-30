@@ -3,6 +3,7 @@
 import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { Icon } from '@/components/ui/Icon';
 
 // Confetti particle component
 function ConfettiParticle({ delay, left }: { delay: number; left: number }) {
@@ -124,7 +125,7 @@ function ResultadosContent() {
           onClick={() => router.push(`/aprender/${courseId}`)}
           className="w-10 h-10 rounded-full hover:bg-slate-100 flex items-center justify-center transition-colors"
         >
-          <span className="material-symbols-outlined text-slate-500">close</span>
+          <Icon name="close" size={24} className="text-slate-500" />
         </button>
         <h2 className="text-lg font-bold text-slate-900">Resultados</h2>
         <div className="w-10" />
@@ -194,12 +195,7 @@ function ResultadosContent() {
               {/* XP Reward */}
               <div className="flex items-center gap-4 p-3 rounded-xl bg-slate-50 border border-transparent hover:border-primary/20 transition-colors">
                 <div className="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center">
-                  <span
-                    className="material-symbols-outlined text-yellow-600 text-[20px]"
-                    style={{ fontVariationSettings: "'FILL' 1" }}
-                  >
-                    star
-                  </span>
+                  <Icon name="star" size={20} className="text-yellow-600" filled={true} />
                 </div>
                 <div className="flex-1">
                   <p className="text-slate-900 font-bold text-sm">+{xpEarned} XP ganados</p>
@@ -210,12 +206,7 @@ function ResultadosContent() {
               {/* Badge Reward */}
               <div className="flex items-center gap-4 p-3 rounded-xl bg-slate-50 border border-transparent hover:border-primary/20 transition-colors">
                 <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
-                  <span
-                    className="material-symbols-outlined text-primary text-[20px]"
-                    style={{ fontVariationSettings: "'FILL' 1" }}
-                  >
-                    emoji_events
-                  </span>
+                  <Icon name="emoji_events" size={20} className="text-primary" filled={true} />
                 </div>
                 <div className="flex-1">
                   <p className="text-slate-900 font-bold text-sm">Badge: Examen aprobado</p>

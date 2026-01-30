@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
+import { Icon } from '@/components/ui/Icon';
 
 interface PostOptionsMenuProps {
   isOpen: boolean;
@@ -70,7 +71,7 @@ export function PostOptionsMenu({
         }}
         className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-gray-50 transition-colors"
       >
-        <span className="material-symbols-outlined text-[18px]">edit</span>
+        <Icon name="edit" size={18} />
         Editar
       </button>
 
@@ -85,7 +86,7 @@ export function PostOptionsMenu({
             : 'text-red-500 hover:bg-red-50'
         )}
       >
-        <span className="material-symbols-outlined text-[18px]">delete</span>
+        <Icon name="delete" size={18} />
         {showConfirmDelete ? '¿Confirmar eliminar?' : 'Eliminar'}
       </button>
     </div>

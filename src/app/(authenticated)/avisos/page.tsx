@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/auth-store';
 import { useSuperAppBridge } from '@/hooks/use-super-app-bridge';
 import { cn } from '@/lib/utils';
+import { Icon } from '@/components/ui/Icon';
 
 interface NotificationItem {
   id: string;
@@ -163,9 +164,7 @@ export default function AvisosPage() {
             onClick={() => router.back()}
             className="flex w-10 h-10 items-center justify-start cursor-pointer group"
           >
-            <span className="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors text-[22px]">
-              arrow_back_ios
-            </span>
+            <Icon name="arrow_back" size={22} className="text-slate-400 group-hover:text-primary transition-colors" />
           </button>
           <h1 className="text-slate-900 text-xl font-semibold tracking-tight flex-1 text-center pr-10">
             Notificaciones
@@ -208,9 +207,7 @@ export default function AvisosPage() {
 
                       {/* Icon */}
                       <div className="relative z-10 glass-icon w-12 h-12 rounded-2xl flex items-center justify-center shrink-0">
-                        <span className={cn('material-symbols-outlined text-[24px] font-light', getNotificationIconColor(notification.type))}>
-                          {getNotificationIcon(notification.type)}
-                        </span>
+                        <Icon name={getNotificationIcon(notification.type)} size={24} className={getNotificationIconColor(notification.type)} />
                       </div>
 
                       {/* Content */}
@@ -263,9 +260,7 @@ export default function AvisosPage() {
                     >
                       {/* Icon */}
                       <div className="relative z-10 glass-icon w-12 h-12 rounded-2xl flex items-center justify-center shrink-0">
-                        <span className={cn('material-symbols-outlined text-[24px] font-light', getNotificationIconColor(notification.type))}>
-                          {getNotificationIcon(notification.type)}
-                        </span>
+                        <Icon name={getNotificationIcon(notification.type)} size={24} className={getNotificationIconColor(notification.type)} />
                       </div>
 
                       {/* Content */}
@@ -310,9 +305,7 @@ export default function AvisosPage() {
                     >
                       {/* Icon */}
                       <div className="relative z-10 glass-icon w-12 h-12 rounded-2xl flex items-center justify-center shrink-0">
-                        <span className={cn('material-symbols-outlined text-[24px] font-light', getNotificationIconColor(notification.type))}>
-                          {getNotificationIcon(notification.type)}
-                        </span>
+                        <Icon name={getNotificationIcon(notification.type)} size={24} className={getNotificationIconColor(notification.type)} />
                       </div>
 
                       {/* Content */}
@@ -337,9 +330,7 @@ export default function AvisosPage() {
             {notifications.length === 0 && (
               <div className="text-center py-12">
                 <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="material-symbols-outlined text-slate-400 text-3xl">
-                    notifications_off
-                  </span>
+                  <Icon name="notifications" size={30} className="text-slate-400" />
                 </div>
                 <p className="text-slate-500 mb-2 font-medium">No tienes notificaciones</p>
                 <p className="text-sm text-slate-400">

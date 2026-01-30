@@ -2,6 +2,7 @@
 
 import { cn, formatRelativeTime, getLevelColor, getLevelTitle, REACTION_ICONS } from '@/lib/utils';
 import { Avatar } from '@/components/ui/Avatar';
+import { Icon } from '@/components/ui/Icon';
 import type { CommunityPost, ReactionType } from '@/types';
 
 interface PostCardProps {
@@ -64,7 +65,7 @@ export function PostCard({
             className="text-slate-400 hover:text-slate-600 rounded-full p-1 transition-colors"
             aria-label="Opciones del post"
           >
-            <span className="material-symbols-outlined text-[20px]">more_horiz</span>
+            <Icon name="more_horiz" size={20} />
           </button>
         )}
       </div>
@@ -104,16 +105,13 @@ export function PostCard({
             {activeReactions.length > 0 ? (
               <>
                 {activeReactions.slice(0, 3).map((type) => (
-                  <span
+                  <Icon
                     key={type}
-                    className={cn(
-                      'material-symbols-outlined text-[16px]',
-                      REACTION_ICONS[type].color
-                    )}
-                    style={{ fontVariationSettings: "'FILL' 1" }}
-                  >
-                    {REACTION_ICONS[type].icon}
-                  </span>
+                    name={REACTION_ICONS[type].icon}
+                    size={16}
+                    filled
+                    className={REACTION_ICONS[type].color}
+                  />
                 ))}
                 <span className="text-xs font-semibold text-slate-600 ml-1">
                   {reactionSummary.total}
@@ -121,9 +119,7 @@ export function PostCard({
               </>
             ) : (
               <>
-                <span className="material-symbols-outlined text-[16px] text-slate-400">
-                  add_reaction
-                </span>
+                <Icon name="add_reaction" size={16} className="text-slate-400" />
                 <span className="text-xs font-semibold text-slate-500">Reaccionar</span>
               </>
             )}
@@ -134,7 +130,7 @@ export function PostCard({
             onClick={() => onCommentClick(post.id)}
             className="flex items-center gap-1.5 text-slate-500 hover:text-primary transition-colors"
           >
-            <span className="material-symbols-outlined text-[20px]">chat_bubble</span>
+            <Icon name="chat_bubble" size={20} />
             <span className="text-xs font-bold">
               {commentCount > 0 ? `${commentCount} Comentarios` : 'Comentar'}
             </span>

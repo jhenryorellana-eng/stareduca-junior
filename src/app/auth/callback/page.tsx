@@ -3,6 +3,7 @@
 import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore } from '@/stores/auth-store';
+import { Icon } from '@/components/ui/Icon';
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -105,9 +106,7 @@ function AuthCallbackContent() {
       <div className="min-h-screen bg-white flex items-center justify-center p-6">
         <div className="max-w-md w-full text-center animate-fade-in-up">
           <div className="w-20 h-20 bg-gradient-to-br from-primary to-primary-dark rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-primary/30">
-            <span className="material-symbols-outlined text-white text-4xl">
-              developer_mode
-            </span>
+            <Icon name="developer_mode" size={40} className="text-white" />
           </div>
           <h1 className="text-2xl font-bold text-slate-900 mb-2">
             Modo Desarrollo
@@ -127,7 +126,7 @@ function AuthCallbackContent() {
               </>
             ) : (
               <>
-                <span className="material-symbols-outlined">login</span>
+                <Icon name="login" size={20} />
                 Entrar como Estudiante Demo
               </>
             )}
@@ -145,7 +144,7 @@ function AuthCallbackContent() {
       <div className="min-h-screen bg-white flex items-center justify-center p-6">
         <div className="max-w-md w-full text-center animate-fade-in-up">
           <div className="w-20 h-20 bg-red-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
-            <span className="material-symbols-outlined text-red-500 text-4xl">error</span>
+            <Icon name="error" size={40} className="text-red-500" />
           </div>
           <h1 className="text-2xl font-bold text-slate-900 mb-2">
             Error de autenticación
@@ -164,7 +163,7 @@ function AuthCallbackContent() {
                 </>
               ) : (
                 <>
-                  <span className="material-symbols-outlined">developer_mode</span>
+                  <Icon name="developer_mode" size={20} />
                   Entrar en Modo Dev
                 </>
               )}
@@ -193,9 +192,7 @@ function AuthCallbackContent() {
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center animate-fade-in-up">
           <div className="w-20 h-20 bg-gradient-to-br from-primary to-primary-dark rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-primary/30">
-            <span className="material-symbols-outlined text-white text-4xl">
-              school
-            </span>
+            <Icon name="school" size={40} className="text-white" />
           </div>
           <h1 className="text-2xl font-bold text-slate-900 mb-2">StarEduca Junior</h1>
           <p className="text-slate-500">Iniciando sesión...</p>
@@ -217,7 +214,7 @@ export default function AuthCallbackPage() {
         <div className="min-h-screen bg-white flex items-center justify-center">
           <div className="text-center">
             <div className="w-20 h-20 bg-gradient-to-br from-primary to-primary-dark rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-primary/30">
-              <span className="material-symbols-outlined text-white text-4xl">school</span>
+              <Icon name="school" size={40} className="text-white" />
             </div>
             <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
           </div>

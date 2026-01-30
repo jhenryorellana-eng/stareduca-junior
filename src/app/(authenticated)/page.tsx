@@ -5,6 +5,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { useAuthStore } from '@/stores/auth-store';
 import { useUserStore, getLevelName, LEVEL_THRESHOLDS } from '@/stores/user-store';
 import { formatXp } from '@/lib/utils';
+import { Icon } from '@/components/ui/Icon';
 import Link from 'next/link';
 
 // Interfaces
@@ -147,7 +148,7 @@ export default function HomePage() {
             href="/avisos"
             className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white backdrop-blur-sm transition hover:bg-white/20"
           >
-            <span className="material-symbols-outlined">notifications</span>
+            <Icon name="notifications" size={24} />
           </Link>
         </div>
 
@@ -286,7 +287,7 @@ export default function HomePage() {
                   <h5 className="mb-1 text-base font-bold text-slate-900 truncate">{course.title}</h5>
                   <div className="flex items-center justify-between">
                     <span className="flex items-center text-xs text-gray-500">
-                      <span className="material-symbols-outlined mr-1 text-[16px]">schedule</span>
+                      <Icon name="schedule" size={16} className="mr-1" />
                       {formatDuration(course.durationMinutes)}
                     </span>
                     <span className="text-xs font-bold text-primary">+{course.xpReward} XP</span>

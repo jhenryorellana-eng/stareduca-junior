@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { useUserStore } from '@/stores/user-store';
+import { Icon } from '@/components/ui/Icon';
 
 const XP_REASON_LABELS: Record<string, string> = {
   lesson_complete: 'Capítulo completado',
@@ -110,12 +111,7 @@ export function XpToast() {
       <div className="fixed top-20 left-1/2 z-50 animate-xp-float">
         <div className="bg-gradient-to-r from-amber-400 to-amber-500 text-white px-6 py-3 rounded-2xl shadow-lg shadow-amber-500/30 flex items-center gap-3">
           <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-            <span
-              className="material-symbols-outlined text-white"
-              style={{ fontVariationSettings: "'FILL' 1" }}
-            >
-              bolt
-            </span>
+            <Icon name="bolt" size={24} filled className="text-white" />
           </div>
           <div>
             <p className="font-bold text-xl">+{xpToastAmount} XP</p>

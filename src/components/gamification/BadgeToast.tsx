@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { useUserStore } from '@/stores/user-store';
+import { Icon } from '@/components/ui/Icon';
 import { cn } from '@/lib/utils';
 
 export function BadgeToast() {
@@ -52,9 +53,7 @@ export function BadgeToast() {
           style={{ background: `linear-gradient(to bottom right, ${colorFrom}, ${colorTo})` }}
         >
           <div className="w-full h-full rounded-full bg-white flex items-center justify-center">
-            <span className="material-symbols-outlined text-6xl" style={{ color: colorTo }}>
-              {badgeToastData.icon}
-            </span>
+            <Icon name={badgeToastData.icon} size={64} filled style={{ color: colorTo }} />
           </div>
         </div>
 

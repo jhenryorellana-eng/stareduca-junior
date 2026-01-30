@@ -8,6 +8,7 @@ import { useUserStore, getLevelName, LEVEL_THRESHOLDS } from '@/stores/user-stor
 import { formatXp } from '@/lib/utils';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase/client';
+import { Icon } from '@/components/ui/Icon';
 
 // Helper para formatear minutos a horas/minutos
 const formatTime = (minutes: number) => {
@@ -108,7 +109,7 @@ export default function PerfilPage() {
           onClick={handleLogout}
           className="p-2 rounded-full hover:bg-black/5 transition-colors"
         >
-          <span className="material-symbols-outlined">logout</span>
+          <Icon name="logout" size={24} />
         </button>
       </div>
 
@@ -177,7 +178,7 @@ export default function PerfilPage() {
           {/* Streak */}
           <div className="bg-white p-3 rounded-xl border border-slate-100 shadow-sm flex flex-col items-center justify-center gap-1 text-center">
             <div className="w-8 h-8 rounded-full bg-orange-100 text-orange-500 flex items-center justify-center mb-1">
-              <span className="material-symbols-outlined text-lg">local_fire_department</span>
+              <Icon name="local_fire_department" size={18} />
             </div>
             <p className="text-lg font-bold text-slate-900 leading-none">{currentStreak}</p>
             <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wide">Racha</p>
@@ -185,7 +186,7 @@ export default function PerfilPage() {
           {/* Courses */}
           <div className="bg-white p-3 rounded-xl border border-slate-100 shadow-sm flex flex-col items-center justify-center gap-1 text-center">
             <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-500 flex items-center justify-center mb-1">
-              <span className="material-symbols-outlined text-lg">menu_book</span>
+              <Icon name="menu_book" size={18} />
             </div>
             <p className="text-lg font-bold text-slate-900 leading-none">{completedCourses}</p>
             <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wide">Cursos</p>
@@ -193,7 +194,7 @@ export default function PerfilPage() {
           {/* Time */}
           <div className="bg-white p-3 rounded-xl border border-slate-100 shadow-sm flex flex-col items-center justify-center gap-1 text-center">
             <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-500 flex items-center justify-center mb-1">
-              <span className="material-symbols-outlined text-lg">timer</span>
+              <Icon name="schedule" size={18} />
             </div>
             <p className="text-lg font-bold text-slate-900 leading-none">{formatTime(totalMinutes)}</p>
             <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wide">Tiempo</p>
@@ -222,9 +223,7 @@ export default function PerfilPage() {
                     style={{ background: `linear-gradient(to bottom right, ${colorFrom}, ${colorTo})` }}
                   >
                     <div className="w-full h-full rounded-full bg-white flex items-center justify-center overflow-hidden border-2 border-transparent">
-                      <span className="material-symbols-outlined text-2xl" style={{ color: colorTo }}>
-                        {badge.icon}
-                      </span>
+                      <Icon name={badge.icon} size={24} style={{ color: colorTo }} />
                     </div>
                   </div>
                 </div>
@@ -236,7 +235,7 @@ export default function PerfilPage() {
               <div key={`locked-${index}`} className="flex flex-col items-center gap-1 opacity-50">
                 <div className="aspect-square w-full rounded-full bg-slate-200 relative">
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="material-symbols-outlined text-slate-400 text-xl">lock</span>
+                    <Icon name="lock" size={20} className="text-slate-400" />
                   </div>
                 </div>
               </div>
@@ -249,7 +248,7 @@ export default function PerfilPage() {
       <div className="px-4 mt-4 animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
         <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
           <div className="flex items-center gap-3 mb-3">
-            <span className="material-symbols-outlined text-primary">person</span>
+            <Icon name="person" size={24} className="text-primary" />
             <h3 className="font-bold text-slate-900">Información</h3>
           </div>
           <div className="space-y-2 text-sm">

@@ -2,6 +2,7 @@
 
 import { cn, getLevelColor, REACTION_ICONS } from '@/lib/utils';
 import { Avatar } from '@/components/ui/Avatar';
+import { Icon } from '@/components/ui/Icon';
 import type { ReactionDetail, ReactionSummary, ReactionType } from '@/types';
 
 interface ReactionDetailsProps {
@@ -44,7 +45,7 @@ export function ReactionDetails({
             onClick={onClose}
             className="p-1 rounded-full hover:bg-gray-100 text-slate-500 transition-colors"
           >
-            <span className="material-symbols-outlined text-[20px]">close</span>
+            <Icon name="close" size={20} />
           </button>
         </div>
 
@@ -68,15 +69,12 @@ export function ReactionDetails({
                 {option === 'all' ? (
                   'Todos'
                 ) : (
-                  <span
-                    className={cn(
-                      'material-symbols-outlined text-[16px]',
-                      !isActive && REACTION_ICONS[option].color
-                    )}
-                    style={{ fontVariationSettings: "'FILL' 1" }}
-                  >
-                    {REACTION_ICONS[option].icon}
-                  </span>
+                  <Icon
+                    name={REACTION_ICONS[option].icon}
+                    size={16}
+                    filled
+                    className={cn(!isActive && REACTION_ICONS[option].color)}
+                  />
                 )}
                 {count !== undefined && count > 0 && (
                   <span className={cn('text-xs', isActive ? 'text-white/80' : 'text-slate-400')}>
@@ -92,13 +90,11 @@ export function ReactionDetails({
         <div className="flex-1 overflow-y-auto">
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
-              <span className="material-symbols-outlined animate-spin text-primary text-[32px]">
-                progress_activity
-              </span>
+              <Icon name="progress_activity" size={32} className="animate-spin text-primary" />
             </div>
           ) : reactions.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-slate-400">
-              <span className="material-symbols-outlined text-[48px] mb-2">sentiment_neutral</span>
+              <Icon name="sentiment_neutral" size={48} className="mb-2" />
               <p className="text-sm">No hay reacciones</p>
             </div>
           ) : (
@@ -114,15 +110,12 @@ export function ReactionDetails({
                       fallback={`${reaction.firstName} ${reaction.lastName}`}
                       size="sm"
                     />
-                    <span
-                      className={cn(
-                        'absolute -bottom-1 -right-1 material-symbols-outlined text-[14px]',
-                        REACTION_ICONS[reaction.type].color
-                      )}
-                      style={{ fontVariationSettings: "'FILL' 1" }}
-                    >
-                      {REACTION_ICONS[reaction.type].icon}
-                    </span>
+                    <Icon
+                      name={REACTION_ICONS[reaction.type].icon}
+                      size={14}
+                      filled
+                      className={cn('absolute -bottom-1 -right-1', REACTION_ICONS[reaction.type].color)}
+                    />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-slate-900 truncate">

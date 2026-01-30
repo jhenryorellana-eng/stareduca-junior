@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { cn, REACTION_ICONS } from '@/lib/utils';
+import { Icon } from '@/components/ui/Icon';
 import type { ReactionType } from '@/types';
 
 interface ReactionPickerProps {
@@ -68,21 +69,18 @@ export function ReactionPicker({
               )}
               title={reaction.label}
             >
-              <span
-                className={cn(
-                  'material-symbols-outlined text-[28px] transition-transform hover:scale-110',
-                  reaction.color
-                )}
-                style={{ fontVariationSettings: "'FILL' 1" }}
-              >
-                {reaction.icon}
-              </span>
+              <Icon
+                name={reaction.icon}
+                size={28}
+                filled
+                className={cn('transition-transform hover:scale-110', reaction.color)}
+              />
               <span className="text-[10px] text-slate-500 mt-0.5 font-medium">
                 {reaction.label.split(' ')[0]}
               </span>
               {isSelected && (
                 <span className="absolute -top-1 -right-1 w-4 h-4 bg-primary rounded-full flex items-center justify-center">
-                  <span className="material-symbols-outlined text-white text-[12px]">check</span>
+                  <Icon name="check" size={12} className="text-white" />
                 </span>
               )}
             </button>

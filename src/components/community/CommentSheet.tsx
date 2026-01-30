@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { cn, formatRelativeTime, getLevelColor } from '@/lib/utils';
 import { Avatar } from '@/components/ui/Avatar';
+import { Icon } from '@/components/ui/Icon';
 import type { CommunityComment } from '@/types';
 
 interface CommentSheetProps {
@@ -131,7 +132,7 @@ export function CommentSheet({
             onClick={onClose}
             className="p-1 rounded-full hover:bg-gray-100 text-slate-500 transition-colors"
           >
-            <span className="material-symbols-outlined text-[20px]">close</span>
+            <Icon name="close" size={20} />
           </button>
         </div>
 
@@ -143,22 +144,18 @@ export function CommentSheet({
         >
           {isLoading && comments.length === 0 ? (
             <div className="flex items-center justify-center py-12">
-              <span className="material-symbols-outlined animate-spin text-primary text-[32px]">
-                progress_activity
-              </span>
+              <Icon name="progress_activity" size={32} className="animate-spin text-primary" />
             </div>
           ) : comments.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-slate-400">
-              <span className="material-symbols-outlined text-[48px] mb-2">chat_bubble</span>
+              <Icon name="chat_bubble" size={48} className="mb-2" />
               <p className="text-sm">Sé el primero en comentar</p>
             </div>
           ) : (
             <div className="space-y-4">
               {isLoading && hasMore && (
                 <div className="flex justify-center py-2">
-                  <span className="material-symbols-outlined animate-spin text-primary text-[20px]">
-                    progress_activity
-                  </span>
+                  <Icon name="progress_activity" size={20} className="animate-spin text-primary" />
                 </div>
               )}
 
@@ -221,11 +218,9 @@ export function CommentSheet({
             )}
           >
             {isSending ? (
-              <span className="material-symbols-outlined animate-spin text-[20px]">
-                progress_activity
-              </span>
+              <Icon name="progress_activity" size={20} className="animate-spin" />
             ) : (
-              <span className="material-symbols-outlined text-[20px]">send</span>
+              <Icon name="send" size={20} />
             )}
           </button>
         </form>

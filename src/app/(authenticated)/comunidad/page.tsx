@@ -13,6 +13,7 @@ import {
   CommentSheet,
 } from '@/components/community';
 import type { CommunityPost, ReactionType } from '@/types';
+import { Icon } from '@/components/ui/Icon';
 
 export default function ComunidadPage() {
   const { token, isLoading: authLoading } = useAuth();
@@ -219,9 +220,7 @@ export default function ComunidadPage() {
   if (authLoading) {
     return (
       <div className="bg-white min-h-screen flex items-center justify-center">
-        <span className="material-symbols-outlined animate-spin text-primary text-[48px]">
-          progress_activity
-        </span>
+        <Icon name="progress_activity" size={48} className="animate-spin text-primary" />
       </div>
     );
   }
@@ -236,7 +235,7 @@ export default function ComunidadPage() {
           aria-label="Crear publicación"
           className="bg-primary hover:bg-primary/90 text-white rounded-xl w-10 h-10 flex items-center justify-center shadow-md transition-all active:scale-95"
         >
-          <span className="material-symbols-outlined">add</span>
+          <Icon name="add" size={24} />
         </button>
       </header>
 
@@ -245,9 +244,7 @@ export default function ComunidadPage() {
         {/* Initial loading */}
         {isLoading && posts.length === 0 && (
           <div className="flex flex-col items-center justify-center py-16">
-            <span className="material-symbols-outlined animate-spin text-primary text-[48px]">
-              progress_activity
-            </span>
+            <Icon name="progress_activity" size={48} className="animate-spin text-primary" />
             <p className="mt-4 text-sm text-slate-500">Cargando publicaciones...</p>
           </div>
         )}
@@ -255,7 +252,7 @@ export default function ComunidadPage() {
         {/* Empty state */}
         {!isLoading && posts.length === 0 && (
           <div className="flex flex-col items-center justify-center py-16 text-slate-400">
-            <span className="material-symbols-outlined text-[64px] mb-4">forum</span>
+            <Icon name="chat_bubble" size={64} className="mb-4" />
             <h2 className="text-lg font-semibold text-slate-600 mb-2">No hay publicaciones</h2>
             <p className="text-sm text-center mb-4">
               Sé el primero en compartir algo con la comunidad
@@ -286,11 +283,9 @@ export default function ComunidadPage() {
         {hasMore && (
           <div ref={sentinelRef} className="py-8 flex flex-col items-center justify-center text-slate-400 gap-2">
             {isLoading ? (
-              <span className="material-symbols-outlined animate-spin text-primary text-[24px]">
-                progress_activity
-              </span>
+              <Icon name="progress_activity" size={24} className="animate-spin text-primary" />
             ) : (
-              <span className="material-symbols-outlined animate-bounce">expand_more</span>
+              <Icon name="expand_more" size={24} className="animate-bounce" />
             )}
             <p className="text-xs font-medium uppercase tracking-widest">
               {isLoading ? 'Cargando...' : 'Cargando más'}
@@ -301,7 +296,7 @@ export default function ComunidadPage() {
         {/* End of feed */}
         {!hasMore && posts.length > 0 && (
           <div className="py-8 flex flex-col items-center justify-center text-slate-400 gap-2">
-            <span className="material-symbols-outlined text-[32px]">check_circle</span>
+            <Icon name="check_circle" size={32} />
             <p className="text-xs font-medium uppercase tracking-widest">
               Estás al día
             </p>

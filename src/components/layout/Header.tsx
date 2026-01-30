@@ -3,6 +3,7 @@
 import { useAuth } from '@/hooks/use-auth';
 import { useSuperAppBridge } from '@/hooks/use-super-app-bridge';
 import { Avatar } from '@/components/ui';
+import { Icon } from '@/components/ui/Icon';
 import { cn } from '@/lib/utils';
 
 interface HeaderProps {
@@ -45,9 +46,7 @@ export function Header({
               onClick={handleBack}
               className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 active:bg-gray-200 transition-colors"
             >
-              <span className="material-symbols-outlined text-secondary">
-                {showBack ? 'arrow_back' : 'close'}
-              </span>
+              <Icon name={showBack ? 'arrow_back' : 'close'} size={24} className="text-secondary" />
             </button>
           )}
           {title && (

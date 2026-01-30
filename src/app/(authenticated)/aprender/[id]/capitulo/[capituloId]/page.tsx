@@ -7,6 +7,7 @@ import { supabase } from '@/lib/supabase/client';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/stores/auth-store';
 import { useUserStore } from '@/stores/user-store';
+import { Icon } from '@/components/ui/Icon';
 
 interface Material {
   id: string;
@@ -425,7 +426,7 @@ export default function ChapterPlayerPage() {
     return (
       <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6">
         <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
-          <span className="material-symbols-outlined text-red-500 text-3xl">error</span>
+          <Icon name="error" size={30} className="text-red-500" />
         </div>
         <h2 className="text-xl font-bold text-slate-900 mb-2">Error</h2>
         <p className="text-slate-500 text-center mb-6">{error || 'Capitulo no encontrado'}</p>
@@ -449,13 +450,13 @@ export default function ChapterPlayerPage() {
             onClick={() => router.push(`/aprender/${courseId}`)}
             className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm text-white flex items-center justify-center"
           >
-            <span className="material-symbols-outlined">arrow_back</span>
+            <Icon name="arrow_back" size={24} />
           </button>
           <div className="text-white text-sm font-bold tracking-wide uppercase opacity-80">
             Capitulo {currentChapterIndex + 1}
           </div>
           <button className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm text-white flex items-center justify-center">
-            <span className="material-symbols-outlined">more_vert</span>
+            <Icon name="more_vert" size={24} />
           </button>
         </div>
 
@@ -477,7 +478,7 @@ export default function ChapterPlayerPage() {
               {/* Completed Badge */}
               {isCompleted && (
                 <div className="absolute top-4 right-4 bg-green-500 text-white px-3 py-1.5 rounded-full text-sm font-bold flex items-center gap-1 shadow-lg">
-                  <span className="material-symbols-outlined text-[18px]">check_circle</span>
+                  <Icon name="check_circle" size={18} />
                   Completado
                 </div>
               )}
@@ -494,9 +495,7 @@ export default function ChapterPlayerPage() {
                 )}
               >
                 <div className="w-16 h-16 rounded-full bg-primary text-white shadow-xl flex items-center justify-center hover:scale-105 transition-transform">
-                  <span className="material-symbols-outlined text-[32px]" style={{ fontVariationSettings: "'FILL' 1" }}>
-                    {isPlaying ? 'pause' : 'play_arrow'}
-                  </span>
+                  <Icon name={isPlaying ? 'pause' : 'play_arrow'} size={32} filled={true} />
                 </div>
               </button>
               {/* Video Controls */}
@@ -525,7 +524,7 @@ export default function ChapterPlayerPage() {
                   </p>
                   <div className="flex items-center gap-4">
                     <button className="text-white/80 hover:text-white">
-                      <span className="material-symbols-outlined text-[20px]">fullscreen</span>
+                      <Icon name="fullscreen" size={20} />
                     </button>
                   </div>
                 </div>
@@ -533,7 +532,7 @@ export default function ChapterPlayerPage() {
             </>
           ) : (
             <div className="w-full h-full flex flex-col items-center justify-center bg-slate-800">
-              <span className="material-symbols-outlined text-white/30 text-6xl mb-2">videocam_off</span>
+              <Icon name="play_circle" size={60} className="text-white/30 mb-2" />
               <p className="text-white/50 text-sm">Video no disponible</p>
             </div>
           )}
@@ -547,7 +546,7 @@ export default function ChapterPlayerPage() {
           <div className="flex items-start justify-between gap-4">
             <h1 className="text-slate-900 text-2xl font-bold leading-tight">{chapter.title}</h1>
             <button className="text-primary shrink-0 mt-1">
-              <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 0" }}>bookmark</span>
+              <Icon name="bookmark" size={24} />
             </button>
           </div>
           {chapter.description && (
@@ -563,7 +562,7 @@ export default function ChapterPlayerPage() {
             <div className="flex justify-between items-center mb-2">
               <span className="text-slate-800 text-sm font-bold">Progreso del capitulo</span>
               <div className="flex items-center gap-1 bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full text-xs font-bold">
-                <span className="material-symbols-outlined text-[14px]">bolt</span>
+                <Icon name="bolt" size={14} />
                 +{chapter.xp_reward} XP
               </div>
             </div>
@@ -594,7 +593,7 @@ export default function ChapterPlayerPage() {
                     'w-10 h-10 rounded-lg flex items-center justify-center shrink-0',
                     getMaterialColor(material.type)
                   )}>
-                    <span className="material-symbols-outlined">{getMaterialIcon(material.type)}</span>
+                    <Icon name={getMaterialIcon(material.type)} size={24} />
                   </div>
                   <div className="flex-1 text-left">
                     <p className="text-slate-900 font-semibold text-sm">{material.title}</p>
@@ -605,7 +604,7 @@ export default function ChapterPlayerPage() {
                       )}
                     </div>
                   </div>
-                  <span className="material-symbols-outlined text-slate-300">chevron_right</span>
+                  <Icon name="chevron_right" size={24} className="text-slate-300" />
                 </button>
               ))}
             </div>
@@ -621,7 +620,7 @@ export default function ChapterPlayerPage() {
               href={`/aprender/${courseId}/capitulo/${prevChapter.id}`}
               className="flex-1 h-12 rounded-xl border border-slate-200 text-slate-600 font-bold text-sm flex items-center justify-center gap-2 hover:bg-slate-50 transition-colors"
             >
-              <span className="material-symbols-outlined text-[20px]">arrow_back</span>
+              <Icon name="arrow_back" size={20} />
               Anterior
             </Link>
           ) : (
@@ -629,7 +628,7 @@ export default function ChapterPlayerPage() {
               href={`/aprender/${courseId}`}
               className="flex-1 h-12 rounded-xl border border-slate-200 text-slate-600 font-bold text-sm flex items-center justify-center gap-2 hover:bg-slate-50 transition-colors"
             >
-              <span className="material-symbols-outlined text-[20px]">arrow_back</span>
+              <Icon name="arrow_back" size={20} />
               Volver
             </Link>
           )}
@@ -639,7 +638,7 @@ export default function ChapterPlayerPage() {
               className="flex-[2] h-12 rounded-xl bg-primary hover:bg-primary-dark text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-primary/30 transition-all active:scale-95"
             >
               Siguiente
-              <span className="material-symbols-outlined text-[20px]">arrow_forward</span>
+              <Icon name="chevron_right" size={20} />
             </Link>
           ) : (
             <Link
@@ -647,7 +646,7 @@ export default function ChapterPlayerPage() {
               className="flex-[2] h-12 rounded-xl bg-green-500 hover:bg-green-600 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-green-500/30 transition-all active:scale-95"
             >
               Completar Curso
-              <span className="material-symbols-outlined text-[20px]">check</span>
+              <Icon name="check" size={20} />
             </Link>
           )}
         </div>

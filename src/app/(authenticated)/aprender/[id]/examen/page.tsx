@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabase/client';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/stores/auth-store';
 import { useUserStore } from '@/stores/user-store';
+import { Icon } from '@/components/ui/Icon';
 
 interface Question {
   id: string;
@@ -243,7 +244,7 @@ export default function ExamenPage() {
     return (
       <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6">
         <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
-          <span className="material-symbols-outlined text-red-500 text-3xl">error</span>
+          <Icon name="error" size={30} className="text-red-500" />
         </div>
         <h2 className="text-xl font-bold text-slate-900 mb-2">Error</h2>
         <p className="text-slate-500 text-center mb-6">{error || 'Examen no disponible'}</p>
@@ -268,7 +269,7 @@ export default function ExamenPage() {
           onClick={() => router.push(`/aprender/${courseId}`)}
           className="w-10 h-10 rounded-full hover:bg-slate-100 flex items-center justify-center transition-colors"
         >
-          <span className="material-symbols-outlined text-slate-500">close</span>
+          <Icon name="close" size={24} className="text-slate-500" />
         </button>
         <h2 className="text-lg font-bold text-slate-900">Examen Final</h2>
         <div className="w-10" />
@@ -326,7 +327,7 @@ export default function ExamenPage() {
                 )}
               >
                 {answers[currentQuestion.id] === i && (
-                  <span className="material-symbols-outlined text-[16px]">check</span>
+                  <Icon name="check" size={16} />
                 )}
               </div>
               <span className="font-medium text-slate-900">{option}</span>
@@ -343,7 +344,7 @@ export default function ExamenPage() {
               onClick={prevQuestion}
               className="h-14 px-6 rounded-xl border-2 border-slate-200 text-slate-600 font-bold hover:bg-slate-50 transition-colors"
             >
-              <span className="material-symbols-outlined">arrow_back</span>
+              <Icon name="arrow_back" size={24} />
             </button>
           )}
 

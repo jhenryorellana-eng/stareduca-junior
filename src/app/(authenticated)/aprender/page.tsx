@@ -6,6 +6,7 @@ import { useAuthStore } from '@/stores/auth-store';
 import { useUserStore } from '@/stores/user-store';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
+import { Icon } from '@/components/ui/Icon';
 
 const MOTIVATIONAL_MESSAGES = [
   '¡Sigue así!',
@@ -172,12 +173,7 @@ export default function AprenderPage() {
           {/* Right: Streak Badge */}
           <div className="flex items-center justify-end">
             <button className="flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-full bg-orange-100 text-orange-600">
-              <span
-                className="material-symbols-outlined text-[20px]"
-                style={{ fontVariationSettings: "'FILL' 1" }}
-              >
-                local_fire_department
-              </span>
+              <Icon name="local_fire_department" size={20} filled={true} />
               <span className="text-sm font-bold">{currentStreak}</span>
             </button>
           </div>
@@ -250,18 +246,18 @@ export default function AprenderPage() {
                       >
                         {!course.thumbnail_url && (
                           <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary to-purple-600 rounded-xl">
-                            <span className="material-symbols-outlined text-white text-3xl opacity-50">school</span>
+                            <Icon name="school" size={30} className="text-white opacity-50" />
                           </div>
                         )}
                       </div>
                       {course.isEnrolled && !course.isCompleted && (
                         <div className="absolute top-2 right-2 bg-black/40 backdrop-blur-sm rounded-full p-1 flex items-center justify-center">
-                          <span className="material-symbols-outlined text-white text-[16px]">play_arrow</span>
+                          <Icon name="play_arrow" size={16} className="text-white" />
                         </div>
                       )}
                       {course.isCompleted && (
                         <div className="absolute top-2 right-2 bg-green-500 rounded-full p-1 flex items-center justify-center">
-                          <span className="material-symbols-outlined text-white text-[14px]">check</span>
+                          <Icon name="check" size={14} className="text-white" />
                         </div>
                       )}
                     </div>
@@ -279,7 +275,7 @@ export default function AprenderPage() {
                           {course.title}
                         </h3>
                         <p className="text-slate-500 text-xs font-medium flex items-center gap-1">
-                          <span className="material-symbols-outlined text-[14px]">school</span>
+                          <Icon name="school" size={14} />
                           {course.chapters_count} Capitulos • {formatDuration(course.total_duration)}
                         </p>
                       </div>
@@ -323,9 +319,7 @@ export default function AprenderPage() {
           {!isLoading && filteredCourses.length === 0 && (
             <div className="text-center py-12">
               <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="material-symbols-outlined text-slate-400 text-3xl">
-                  {activeTab === 'completed' ? 'emoji_events' : 'search'}
-                </span>
+                <Icon name={activeTab === 'completed' ? 'emoji_events' : 'search'} size={30} className="text-slate-400" />
               </div>
               <p className="text-slate-500 font-medium">
                 {activeTab === 'completed'
@@ -342,7 +336,7 @@ export default function AprenderPage() {
             <div className="mt-4 p-4 rounded-2xl bg-gradient-to-br from-primary to-primary-dark text-white shadow-lg animate-fade-in-up">
               <div className="flex items-center gap-3">
                 <div className="bg-white/20 p-2 rounded-full backdrop-blur-sm">
-                  <span className="material-symbols-outlined text-white">emoji_events</span>
+                  <Icon name="emoji_events" size={24} className="text-white" />
                 </div>
                 <div>
                   <h4 className="font-bold text-sm">¡Casi subes de nivel!</h4>

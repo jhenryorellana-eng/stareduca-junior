@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
+import { Icon } from '@/components/ui/Icon';
 import type { CommunityPost } from '@/types';
 
 interface CreatePostModalProps {
@@ -156,9 +157,7 @@ export function CreatePostModal({
             )}
           >
             {isLoading ? (
-              <span className="material-symbols-outlined animate-spin text-[16px]">
-                progress_activity
-              </span>
+              <Icon name="progress_activity" size={16} className="animate-spin" />
             ) : isEditing ? (
               'Guardar'
             ) : (
@@ -198,7 +197,7 @@ export function CreatePostModal({
                 className="absolute top-2 right-2 bg-black/60 hover:bg-black/80 text-white rounded-full p-1.5 transition-colors"
                 title="Quitar imagen"
               >
-                <span className="material-symbols-outlined text-[18px]">close</span>
+                <Icon name="close" size={18} />
               </button>
             </div>
           )}
@@ -233,7 +232,7 @@ export function CreatePostModal({
               )}
               title="Agregar imagen"
             >
-              <span className="material-symbols-outlined text-[20px]">image</span>
+              <Icon name="image" size={20} />
             </button>
 
             <button
@@ -241,7 +240,7 @@ export function CreatePostModal({
               title="Agregar emoji (próximamente)"
               disabled
             >
-              <span className="material-symbols-outlined text-[20px]">mood</span>
+              <Icon name="mood" size={20} />
             </button>
           </div>
 

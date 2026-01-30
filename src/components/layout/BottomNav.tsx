@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useUserStore } from '@/stores/user-store';
+import { Icon } from '@/components/ui/Icon';
 
 const tabs = [
   { name: 'Inicio', icon: 'home', href: '/' },
@@ -44,16 +45,7 @@ export function BottomNav() {
                   active ? 'bg-primary/10' : 'bg-transparent group-hover:bg-gray-50'
                 )}
               >
-                <span
-                  className="material-symbols-outlined text-[24px]"
-                  style={{
-                    fontVariationSettings: active
-                      ? "'FILL' 1, 'wght' 500"
-                      : "'FILL' 0, 'wght' 400",
-                  }}
-                >
-                  {tab.icon}
-                </span>
+                <Icon name={tab.icon} size={24} filled={active} />
                 {showBadge && (
                   <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-red-500 rounded-full border border-white" />
                 )}

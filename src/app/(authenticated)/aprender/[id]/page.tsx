@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { supabase } from '@/lib/supabase/client';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/stores/auth-store';
+import { Icon } from '@/components/ui/Icon';
 
 interface Chapter {
   id: string;
@@ -211,7 +212,7 @@ export default function CourseDetailPage() {
     return (
       <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6">
         <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
-          <span className="material-symbols-outlined text-red-500 text-3xl">error</span>
+          <Icon name="error" size={30} className="text-red-500" />
         </div>
         <h2 className="text-xl font-bold text-slate-900 mb-2">Error</h2>
         <p className="text-slate-500 text-center mb-6">{error || 'Curso no encontrado'}</p>
@@ -237,7 +238,7 @@ export default function CourseDetailPage() {
         >
           {!course.thumbnail_url && (
             <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary to-purple-600">
-              <span className="material-symbols-outlined text-white text-6xl opacity-50">school</span>
+              <Icon name="school" size={60} className="text-white opacity-50" />
             </div>
           )}
           {/* Gradient Overlay */}
@@ -248,13 +249,13 @@ export default function CourseDetailPage() {
             onClick={() => router.push('/aprender')}
             className="absolute top-4 left-4 w-10 h-10 rounded-full bg-black/30 backdrop-blur-sm text-white flex items-center justify-center hover:bg-black/40 transition-colors"
           >
-            <span className="material-symbols-outlined">arrow_back</span>
+            <Icon name="arrow_back" size={24} />
           </button>
 
           {/* Category Badge */}
           <div className="absolute bottom-4 left-4 right-4">
             <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-white/20 backdrop-blur-sm border border-white/30 text-xs font-semibold text-white">
-              <span className="material-symbols-outlined text-[14px]">trending_up</span>
+              <Icon name="trending_up" size={14} />
               {getCategoryLabel(course.category)}
             </span>
           </div>
@@ -311,7 +312,7 @@ export default function CourseDetailPage() {
         {course.chapters.length === 0 ? (
           <div className="text-center py-8">
             <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <span className="material-symbols-outlined text-slate-400 text-3xl">video_library</span>
+              <Icon name="play_circle" size={30} className="text-slate-400" />
             </div>
             <p className="text-slate-500">Este curso aun no tiene capitulos</p>
           </div>
@@ -335,7 +336,7 @@ export default function CourseDetailPage() {
                     <div className="relative flex items-center p-4 rounded-3xl border border-primary/20 bg-white shadow-sm">
                       {/* Circle with play */}
                       <div className="flex-shrink-0 h-12 w-12 rounded-full bg-primary text-white flex items-center justify-center shadow-lg shadow-primary/30">
-                        <span className="material-symbols-outlined text-[24px]" style={{ fontVariationSettings: "'FILL' 1" }}>play_arrow</span>
+                        <Icon name="play_arrow" size={24} filled={true} />
                       </div>
                       <div className="ml-4 flex-1">
                         <div className="flex justify-between items-start gap-2">
@@ -370,9 +371,9 @@ export default function CourseDetailPage() {
                     isLocked && 'bg-slate-200 text-slate-400'
                   )}>
                     {isCompleted ? (
-                      <span className="material-symbols-outlined text-[24px]">check</span>
+                      <Icon name="check" size={24} />
                     ) : (
-                      <span className="material-symbols-outlined text-[20px]">lock</span>
+                      <Icon name="lock" size={20} />
                     )}
                   </div>
 
@@ -402,7 +403,7 @@ export default function CourseDetailPage() {
               <div className="mt-4">
                 <div className="flex flex-col items-center justify-center p-6 rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 text-center opacity-60">
                   <div className="h-12 w-12 rounded-full bg-slate-200 flex items-center justify-center text-slate-400 mb-3">
-                    <span className="material-symbols-outlined text-[24px]">lock</span>
+                    <Icon name="lock" size={24} />
                   </div>
                   <h4 className="text-base font-bold text-slate-400">Examen Final</h4>
                   <p className="text-xs text-slate-400 mt-1 max-w-[200px]">
@@ -420,7 +421,7 @@ export default function CourseDetailPage() {
                   className="flex flex-col items-center justify-center p-6 rounded-2xl border-2 border-dashed border-primary/30 bg-primary/5 text-center hover:bg-primary/10 transition-colors"
                 >
                   <div className="h-12 w-12 rounded-full bg-primary/20 flex items-center justify-center text-primary mb-3">
-                    <span className="material-symbols-outlined text-[24px]">school</span>
+                    <Icon name="school" size={24} />
                   </div>
                   <h4 className="text-base font-bold text-primary">Examen Final</h4>
                   <p className="text-xs text-primary/70 mt-1 max-w-[200px]">
@@ -446,7 +447,7 @@ export default function CourseDetailPage() {
               className="w-full h-14 rounded-xl bg-primary hover:bg-primary-dark text-white font-bold text-base flex items-center justify-center gap-2 shadow-lg shadow-primary/30 transition-all active:scale-95"
             >
               {completedChapters.size === 0 ? 'Comenzar Curso' : 'Continuar'}
-              <span className="material-symbols-outlined">arrow_forward</span>
+              <Icon name="chevron_right" size={24} />
             </Link>
           ) : exam ? (
             // All chapters complete + has exam
@@ -455,14 +456,12 @@ export default function CourseDetailPage() {
               className="w-full h-14 rounded-xl bg-primary hover:bg-primary-dark text-white font-bold text-base flex items-center justify-center gap-2 shadow-lg shadow-primary/30 transition-all active:scale-95"
             >
               {examTaken ? 'Reiniciar examen' : 'Ir al examen'}
-              <span className="material-symbols-outlined">
-                {examTaken ? 'refresh' : 'school'}
-              </span>
+              <Icon name={examTaken ? 'refresh' : 'school'} size={24} />
             </Link>
           ) : (
             // All chapters complete but no exam
             <div className="w-full h-14 rounded-xl bg-green-500 text-white font-bold text-base flex items-center justify-center gap-2">
-              <span className="material-symbols-outlined">check_circle</span>
+              <Icon name="check_circle" size={24} />
               Curso Completado
             </div>
           )}
