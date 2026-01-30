@@ -1,0 +1,659 @@
+'use client';
+
+import { useEffect, useState, useRef, useCallback } from 'react';
+import { useRouter, useParams } from 'next/navigation';
+import Link from 'next/link';
+import { supabase } from '@/lib/supabase/client';
+import { cn } from '@/lib/utils';
+import { useAuthStore } from '@/stores/auth-store';
+import { useUserStore } from '@/stores/user-store';
+
+interface Material {
+  id: string;
+  title: string;
+  type: 'pdf' | 'image' | 'video' | 'audio' | 'url';
+  file_path: string | null;
+  external_url: string | null;
+}
+
+interface Chapter {
+  id: string;
+  title: string;
+  description: string | null;
+  video_url: string | null;
+  duration_minutes: number | null;
+  xp_reward: number;
+  order_index: number;
+  course_id: string;
+}
+
+interface Course {
+  id: string;
+  title: string;
+  xp_reward: number;
+}
+
+export default function ChapterPlayerPage() {
+  const router = useRouter();
+  const params = useParams();
+  const courseId = params.id as string;
+  const chapterId = params.capituloId as string;
+
+  const { student, token } = useAuthStore();
+  const { showXpGain } = useUserStore();
+
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const lastSaveTimeRef = useRef<number>(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [progress, setProgress] = useState(0);
+  const [isCompleted, setIsCompleted] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+
+  const [chapter, setChapter] = useState<Chapter | null>(null);
+  const [course, setCourse] = useState<Course | null>(null);
+  const [allChapters, setAllChapters] = useState<Chapter[]>([]);
+  const [materials, setMaterials] = useState<Material[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const currentChapterIndex = allChapters.findIndex(ch => ch.id === chapterId);
+  const prevChapter = currentChapterIndex > 0 ? allChapters[currentChapterIndex - 1] : null;
+  const nextChapter = currentChapterIndex < allChapters.length - 1 ? allChapters[currentChapterIndex + 1] : null;
+
+  // Get user's timezone for streak calculation
+  const userTimezone = typeof window !== 'undefined'
+    ? Intl.DateTimeFormat().resolvedOptions().timeZone
+    : 'America/Lima';
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        // Fetch chapter
+        const { data: chapterData, error: chapterError } = await supabase
+          .from('lessons')
+          .select('*')
+          .eq('id', chapterId)
+          .single();
+
+        if (chapterError) throw chapterError;
+        setChapter(chapterData);
+
+        // Fetch course
+        const { data: courseData, error: courseError } = await supabase
+          .from('courses')
+          .select('id, title, xp_reward')
+          .eq('id', courseId)
+          .single();
+
+        if (courseError) throw courseError;
+        setCourse(courseData);
+
+        // Fetch all chapters for navigation
+        const { data: chaptersData, error: chaptersError } = await supabase
+          .from('lessons')
+          .select('*')
+          .eq('course_id', courseId)
+          .order('order_index');
+
+        if (chaptersError) throw chaptersError;
+        setAllChapters(chaptersData || []);
+
+        // Fetch materials
+        const { data: materialsData } = await supabase
+          .from('lesson_materials')
+          .select('*')
+          .eq('lesson_id', chapterId)
+          .order('order_index');
+
+        setMaterials(materialsData || []);
+      } catch (err: any) {
+        console.error('Error fetching data:', err);
+        setError(err.message || 'No se pudo cargar el capitulo');
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchData();
+  }, [courseId, chapterId]);
+
+  // Cargar estado de completitud usando el API (no usa Supabase directo por RLS)
+  useEffect(() => {
+    async function loadCompletionStatus() {
+      if (!student?.id || !token) return;
+
+      try {
+        const response = await fetch(`/api/progress?courseId=${courseId}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          const lessonProgress = data.lessonProgress?.find(
+            (p: { lesson_id: string; is_completed: boolean; watch_time_seconds: number }) => p.lesson_id === chapterId
+          );
+
+          if (lessonProgress?.is_completed) {
+            setIsCompleted(true);
+            setProgress(100);
+          } else if (lessonProgress?.watch_time_seconds > 0 && duration > 0) {
+            const savedProgress = (lessonProgress.watch_time_seconds / duration) * 100;
+            setProgress(Math.min(savedProgress, 100));
+            if (videoRef.current) {
+              videoRef.current.currentTime = lessonProgress.watch_time_seconds;
+            }
+          }
+        }
+      } catch (err) {
+        console.error('Error loading progress:', err);
+      }
+    }
+
+    loadCompletionStatus();
+  }, [student?.id, token, courseId, chapterId, duration]);
+
+  // Save progress function
+  const saveProgress = useCallback(async (watchTime: number, completed: boolean = false) => {
+    if (!student?.id || !token || isSaving) return;
+
+    // Debounce - only save if 5+ seconds since last save (unless completing)
+    const now = Date.now();
+    if (!completed && now - lastSaveTimeRef.current < 5000) return;
+    lastSaveTimeRef.current = now;
+
+    setIsSaving(true);
+    try {
+      const response = await fetch('/api/progress', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          lessonId: chapterId,
+          courseId,
+          watchTimeSeconds: Math.floor(watchTime),
+          isCompleted: completed,
+        }),
+      });
+
+      const data = await response.json();
+
+      // Award XP for starting a new course (first time enrollment)
+      if (data.isNewEnrollment) {
+        try {
+          const startXpResponse = await fetch('/api/gamification', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json',
+              'x-timezone': userTimezone,
+            },
+            body: JSON.stringify({
+              amount: 10,
+              reason: 'course_start',
+              referenceId: courseId,
+            }),
+          });
+
+          if (startXpResponse.ok) {
+            showXpGain(10, 'course_start');
+          }
+        } catch (xpError) {
+          console.error('Error awarding course start XP:', xpError);
+        }
+      }
+
+      if (completed && data.isNewCompletion && chapter) {
+        // Award XP via API for lesson completion
+        const lessonXpDelay = data.isNewEnrollment ? 3500 : 0;
+        if (chapter.xp_reward > 0) {
+          try {
+            const xpResponse = await fetch('/api/gamification', {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+                'x-timezone': userTimezone,
+              },
+              body: JSON.stringify({
+                amount: chapter.xp_reward,
+                reason: 'lesson_complete',
+                referenceId: chapter.id,
+              }),
+            });
+
+            if (xpResponse.ok) {
+              // Delay slightly so course_start toast shows first if applicable
+              setTimeout(() => {
+                showXpGain(chapter.xp_reward, 'lesson_complete');
+              }, lessonXpDelay);
+            }
+          } catch (xpError) {
+            console.error('Error awarding XP:', xpError);
+          }
+        }
+
+        // Check if this is the last chapter - award course completion XP
+        const isLastChapter = currentChapterIndex === allChapters.length - 1;
+        if (isLastChapter && course?.xp_reward && course.xp_reward > 0) {
+          // Delay course XP to show after lesson XP toast
+          const courseXpDelay = lessonXpDelay + (chapter.xp_reward > 0 ? 3500 : 0);
+          setTimeout(async () => {
+            try {
+              const courseXpResponse = await fetch('/api/gamification', {
+                method: 'POST',
+                headers: {
+                  'Authorization': `Bearer ${token}`,
+                  'Content-Type': 'application/json',
+                  'x-timezone': userTimezone,
+                },
+                body: JSON.stringify({
+                  amount: course.xp_reward,
+                  reason: 'course_complete',
+                  referenceId: courseId,
+                }),
+              });
+
+              if (courseXpResponse.ok) {
+                showXpGain(course.xp_reward, 'course_complete');
+              }
+            } catch (err) {
+              console.error('Error awarding course XP:', err);
+            }
+          }, courseXpDelay);
+        }
+
+        setIsCompleted(true);
+      }
+    } catch (err) {
+      console.error('Error saving progress:', err);
+    } finally {
+      setIsSaving(false);
+    }
+  }, [student?.id, token, chapterId, courseId, chapter, course, allChapters, currentChapterIndex, showXpGain, isSaving]);
+
+  // Auto-save progress periodically while playing
+  useEffect(() => {
+    if (!isPlaying || !videoRef.current) return;
+
+    const interval = setInterval(() => {
+      if (videoRef.current && !isCompleted) {
+        saveProgress(videoRef.current.currentTime, false);
+      }
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [isPlaying, isCompleted, saveProgress]);
+
+  // Handle video ended - mark as completed
+  const handleVideoEnded = async () => {
+    if (!isCompleted && duration > 0) {
+      await saveProgress(duration, true);
+    }
+  };
+
+  // Video event handlers
+  const handleTimeUpdate = () => {
+    if (videoRef.current) {
+      setCurrentTime(videoRef.current.currentTime);
+      // Solo actualizar progreso si NO está completado
+      if (!isCompleted) {
+        setProgress((videoRef.current.currentTime / videoRef.current.duration) * 100);
+      }
+    }
+  };
+
+  const handleLoadedMetadata = () => {
+    if (videoRef.current) {
+      setDuration(videoRef.current.duration);
+    }
+  };
+
+  const togglePlay = () => {
+    if (videoRef.current) {
+      if (isPlaying) {
+        videoRef.current.pause();
+      } else {
+        videoRef.current.play();
+      }
+      setIsPlaying(!isPlaying);
+    }
+  };
+
+  const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (videoRef.current) {
+      const rect = e.currentTarget.getBoundingClientRect();
+      const percent = (e.clientX - rect.left) / rect.width;
+      videoRef.current.currentTime = percent * videoRef.current.duration;
+    }
+  };
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const getMaterialIcon = (type: string) => {
+    switch (type) {
+      case 'pdf': return 'picture_as_pdf';
+      case 'video': return 'smart_display';
+      case 'audio': return 'headphones';
+      case 'image': return 'image';
+      case 'url': return 'link';
+      default: return 'description';
+    }
+  };
+
+  const getMaterialColor = (type: string) => {
+    switch (type) {
+      case 'pdf': return 'bg-red-50 text-red-500';
+      case 'video': return 'bg-blue-50 text-blue-500';
+      case 'audio': return 'bg-purple-50 text-purple-500';
+      case 'image': return 'bg-emerald-50 text-emerald-500';
+      case 'url': return 'bg-orange-50 text-orange-500';
+      default: return 'bg-slate-50 text-slate-500';
+    }
+  };
+
+  const getMaterialLabel = (type: string) => {
+    switch (type) {
+      case 'pdf': return 'Documento PDF';
+      case 'video': return 'Video Extra';
+      case 'audio': return 'Audio';
+      case 'image': return 'Imagen';
+      case 'url': return 'Enlace Web';
+      default: return 'Material';
+    }
+  };
+
+  // Track viewed materials to avoid duplicate XP
+  const [viewedMaterials, setViewedMaterials] = useState<Set<string>>(new Set());
+
+  const handleMaterialClick = async (material: Material) => {
+    // Open material in new tab
+    const url = material.file_path || material.external_url;
+    if (url) {
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
+
+    // Award XP only once per material per session
+    if (!viewedMaterials.has(material.id) && token) {
+      setViewedMaterials(prev => new Set(prev).add(material.id));
+
+      try {
+        const xpResponse = await fetch('/api/gamification', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+            'x-timezone': userTimezone,
+          },
+          body: JSON.stringify({
+            amount: 5,
+            reason: 'material_view',
+            referenceId: material.id,
+          }),
+        });
+
+        if (xpResponse.ok) {
+          showXpGain(5, 'material_view');
+        }
+      } catch (err) {
+        console.error('Error awarding material XP:', err);
+      }
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-10 h-10 border-3 border-primary border-t-transparent rounded-full animate-spin" />
+          <p className="text-white/60 text-sm">Cargando capitulo...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !chapter) {
+    return (
+      <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6">
+        <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
+          <span className="material-symbols-outlined text-red-500 text-3xl">error</span>
+        </div>
+        <h2 className="text-xl font-bold text-slate-900 mb-2">Error</h2>
+        <p className="text-slate-500 text-center mb-6">{error || 'Capitulo no encontrado'}</p>
+        <button
+          onClick={() => router.back()}
+          className="px-6 py-3 bg-primary text-white font-bold rounded-xl"
+        >
+          Volver
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-white min-h-screen flex flex-col max-w-md mx-auto">
+      {/* Dark Header Area with Video */}
+      <div className="bg-slate-900 pb-2 relative z-10 rounded-b-xl">
+        {/* Top App Bar */}
+        <div className="flex items-center justify-between px-4 pt-6 pb-2">
+          <button
+            onClick={() => router.push(`/aprender/${courseId}`)}
+            className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm text-white flex items-center justify-center"
+          >
+            <span className="material-symbols-outlined">arrow_back</span>
+          </button>
+          <div className="text-white text-sm font-bold tracking-wide uppercase opacity-80">
+            Capitulo {currentChapterIndex + 1}
+          </div>
+          <button className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm text-white flex items-center justify-center">
+            <span className="material-symbols-outlined">more_vert</span>
+          </button>
+        </div>
+
+        {/* Video Player */}
+        <div className="relative w-full aspect-video bg-black group mt-2 shadow-lg">
+          {chapter.video_url ? (
+            <>
+              <video
+                ref={videoRef}
+                src={chapter.video_url}
+                className="w-full h-full object-contain"
+                onTimeUpdate={handleTimeUpdate}
+                onLoadedMetadata={handleLoadedMetadata}
+                onPlay={() => setIsPlaying(true)}
+                onPause={() => setIsPlaying(false)}
+                onEnded={handleVideoEnded}
+                playsInline
+              />
+              {/* Completed Badge */}
+              {isCompleted && (
+                <div className="absolute top-4 right-4 bg-green-500 text-white px-3 py-1.5 rounded-full text-sm font-bold flex items-center gap-1 shadow-lg">
+                  <span className="material-symbols-outlined text-[18px]">check_circle</span>
+                  Completado
+                </div>
+              )}
+              {/* Dark Overlay when paused */}
+              {!isPlaying && (
+                <div className="absolute inset-0 bg-black/40" />
+              )}
+              {/* Center Play Button */}
+              <button
+                onClick={togglePlay}
+                className={cn(
+                  'absolute inset-0 flex items-center justify-center transition-opacity',
+                  isPlaying ? 'opacity-0 hover:opacity-100' : 'opacity-100'
+                )}
+              >
+                <div className="w-16 h-16 rounded-full bg-primary text-white shadow-xl flex items-center justify-center hover:scale-105 transition-transform">
+                  <span className="material-symbols-outlined text-[32px]" style={{ fontVariationSettings: "'FILL' 1" }}>
+                    {isPlaying ? 'pause' : 'play_arrow'}
+                  </span>
+                </div>
+              </button>
+              {/* Video Controls */}
+              <div className="absolute inset-x-0 bottom-0 px-4 py-3">
+                {/* Progress Bar */}
+                <div
+                  className="h-6 flex items-center cursor-pointer"
+                  onClick={handleSeek}
+                >
+                  <div className="h-1 w-full rounded-full bg-white/30 backdrop-blur-sm overflow-hidden">
+                    <div
+                      className="h-full bg-primary relative"
+                      style={{ width: `${progress}%` }}
+                    />
+                  </div>
+                  {/* Scrubber Handle */}
+                  <div
+                    className="absolute w-3 h-3 rounded-full bg-white shadow-md -translate-x-1/2"
+                    style={{ left: `${progress}%` }}
+                  />
+                </div>
+                {/* Time */}
+                <div className="flex items-center justify-between -mt-1">
+                  <p className="text-white text-xs font-medium tracking-wide font-mono">
+                    {formatTime(currentTime)} / {formatTime(duration)}
+                  </p>
+                  <div className="flex items-center gap-4">
+                    <button className="text-white/80 hover:text-white">
+                      <span className="material-symbols-outlined text-[20px]">fullscreen</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="w-full h-full flex flex-col items-center justify-center bg-slate-800">
+              <span className="material-symbols-outlined text-white/30 text-6xl mb-2">videocam_off</span>
+              <p className="text-white/50 text-sm">Video no disponible</p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-1 overflow-y-auto pb-28">
+        {/* Lesson Header */}
+        <div className="px-5 pt-6 pb-2">
+          <div className="flex items-start justify-between gap-4">
+            <h1 className="text-slate-900 text-2xl font-bold leading-tight">{chapter.title}</h1>
+            <button className="text-primary shrink-0 mt-1">
+              <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 0" }}>bookmark</span>
+            </button>
+          </div>
+          {chapter.description && (
+            <p className="text-slate-500 text-sm font-medium leading-relaxed mt-2">
+              {chapter.description}
+            </p>
+          )}
+        </div>
+
+        {/* Progress Card */}
+        <div className="px-5 py-4">
+          <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100">
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-slate-800 text-sm font-bold">Progreso del capitulo</span>
+              <div className="flex items-center gap-1 bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full text-xs font-bold">
+                <span className="material-symbols-outlined text-[14px]">bolt</span>
+                +{chapter.xp_reward} XP
+              </div>
+            </div>
+            <div className="h-2.5 w-full bg-slate-100 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-primary rounded-full"
+                style={{ width: `${Math.round(progress)}%` }}
+              />
+            </div>
+            <p className="text-slate-400 text-xs font-medium mt-2 text-right">
+              {Math.round(progress)}% Completado
+            </p>
+          </div>
+        </div>
+
+        {/* Materials Section */}
+        {materials.length > 0 && (
+          <div className="px-5 mt-2">
+            <h3 className="text-slate-900 text-lg font-bold mb-3">Materiales de este capitulo</h3>
+            <div className="flex flex-col gap-3">
+              {materials.map((material) => (
+                <button
+                  key={material.id}
+                  onClick={() => handleMaterialClick(material)}
+                  className="flex items-center gap-4 bg-white p-3 rounded-xl border border-slate-100 hover:border-primary/30 transition-all group active:scale-[0.98] w-full text-left"
+                >
+                  <div className={cn(
+                    'w-10 h-10 rounded-lg flex items-center justify-center shrink-0',
+                    getMaterialColor(material.type)
+                  )}>
+                    <span className="material-symbols-outlined">{getMaterialIcon(material.type)}</span>
+                  </div>
+                  <div className="flex-1 text-left">
+                    <p className="text-slate-900 font-semibold text-sm">{material.title}</p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-slate-400 text-xs">{getMaterialLabel(material.type)}</p>
+                      {!viewedMaterials.has(material.id) && (
+                        <span className="text-[10px] font-bold text-amber-600 bg-amber-100 px-1.5 py-0.5 rounded">+5 XP</span>
+                      )}
+                    </div>
+                  </div>
+                  <span className="material-symbols-outlined text-slate-300">chevron_right</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Sticky Bottom Navigation */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-100 px-5 py-4 z-20 max-w-md mx-auto">
+        <div className="flex items-center gap-4">
+          {prevChapter ? (
+            <Link
+              href={`/aprender/${courseId}/capitulo/${prevChapter.id}`}
+              className="flex-1 h-12 rounded-xl border border-slate-200 text-slate-600 font-bold text-sm flex items-center justify-center gap-2 hover:bg-slate-50 transition-colors"
+            >
+              <span className="material-symbols-outlined text-[20px]">arrow_back</span>
+              Anterior
+            </Link>
+          ) : (
+            <Link
+              href={`/aprender/${courseId}`}
+              className="flex-1 h-12 rounded-xl border border-slate-200 text-slate-600 font-bold text-sm flex items-center justify-center gap-2 hover:bg-slate-50 transition-colors"
+            >
+              <span className="material-symbols-outlined text-[20px]">arrow_back</span>
+              Volver
+            </Link>
+          )}
+          {nextChapter ? (
+            <Link
+              href={`/aprender/${courseId}/capitulo/${nextChapter.id}`}
+              className="flex-[2] h-12 rounded-xl bg-primary hover:bg-primary-dark text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-primary/30 transition-all active:scale-95"
+            >
+              Siguiente
+              <span className="material-symbols-outlined text-[20px]">arrow_forward</span>
+            </Link>
+          ) : (
+            <Link
+              href={`/aprender/${courseId}`}
+              className="flex-[2] h-12 rounded-xl bg-green-500 hover:bg-green-600 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-green-500/30 transition-all active:scale-95"
+            >
+              Completar Curso
+              <span className="material-symbols-outlined text-[20px]">check</span>
+            </Link>
+          )}
+        </div>
+        {/* iOS Home Indicator Space */}
+        <div className="h-1 w-1/3 bg-slate-200 mx-auto rounded-full mt-3" />
+      </div>
+    </div>
+  );
+}
