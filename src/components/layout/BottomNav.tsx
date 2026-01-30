@@ -24,7 +24,7 @@ export function BottomNav() {
   };
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 rounded-t-4xl bg-white shadow-[0_-4px_20px_rgba(0,0,0,0.05)] border-t border-gray-100">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 rounded-t-4xl bg-white shadow-[0_-4px_20px_rgba(0,0,0,0.05)] border-t border-gray-100 pb-[env(safe-area-inset-bottom)]">
       <div className="flex h-20 w-full items-center justify-around px-2 pb-2">
         {tabs.map((tab) => {
           const active = isActive(tab.href);

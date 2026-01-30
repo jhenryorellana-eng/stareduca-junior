@@ -89,7 +89,7 @@ export default function AuthenticatedLayout({
   }
 
   return (
-    <div className={`min-h-screen bg-background-light ${!shouldHideNav ? 'pb-20' : ''}`}>
+    <div className={`min-h-screen bg-background-light ${!shouldHideNav ? 'pb-[calc(5rem+env(safe-area-inset-bottom))]' : ''}`}>
       {/* XP Toast for gamification feedback */}
       <XpToast />
       {/* Badge Toast for badge earned feedback */}
