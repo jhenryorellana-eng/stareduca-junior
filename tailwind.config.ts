@@ -37,8 +37,8 @@ const config: Config = {
         },
       },
       fontFamily: {
-        quicksand: ['Quicksand', 'sans-serif'],
-        display: ['Quicksand', 'sans-serif'],
+        quicksand: ['var(--font-quicksand)', 'Quicksand', 'sans-serif'],
+        display: ['var(--font-quicksand)', 'Quicksand', 'sans-serif'],
       },
       borderRadius: {
         '2xl': '1rem',

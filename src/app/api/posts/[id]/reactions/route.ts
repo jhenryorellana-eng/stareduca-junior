@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient } from '@/lib/supabase/server';
+import { createUntypedServerClient } from '@/lib/supabase/server';
 import { getAuthFromRequest, unauthorizedResponse } from '@/lib/auth';
 import { getLevelTitle } from '@/lib/utils';
 import type { ReactionDetail, ReactionSummary, ReactionType } from '@/types';
@@ -19,7 +19,7 @@ export async function GET(
   const { searchParams } = new URL(request.url);
   const typeFilter = searchParams.get('type') as ReactionType | null;
 
-  const supabase = createServerClient();
+  const supabase = createUntypedServerClient();
 
   // Verify post exists
   const { data: post } = await supabase.from('posts').select('id').eq('id', postId).single();
@@ -110,7 +110,7 @@ export async function POST(
     );
   }
 
-  const supabase = createServerClient();
+  const supabase = createUntypedServerClient();
 
   // Verify post exists and get owner
   const { data: post } = await supabase
@@ -195,7 +195,7 @@ export async function DELETE(
 
   const { id: postId } = await params;
 
-  const supabase = createServerClient();
+  const supabase = createUntypedServerClient();
 
   // Check existing reaction
   const { data: existingReaction } = await supabase

@@ -377,12 +377,113 @@ export interface Database {
           created_at?: string
         }
       }
+      exams: {
+        Row: {
+          id: string
+          course_id: string
+          title: string
+          description: string | null
+          passing_score: number
+          is_active: boolean
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          course_id: string
+          title: string
+          description?: string | null
+          passing_score?: number
+          is_active?: boolean
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          course_id?: string
+          title?: string
+          description?: string | null
+          passing_score?: number
+          is_active?: boolean
+          created_at?: string
+        }
+      }
+      exam_questions: {
+        Row: {
+          id: string
+          exam_id: string
+          question: string
+          options: string[]
+          correct_option: number
+          order_index: number
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          exam_id: string
+          question: string
+          options: string[]
+          correct_option: number
+          order_index: number
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          exam_id?: string
+          question?: string
+          options?: string[]
+          correct_option?: number
+          order_index?: number
+          created_at?: string
+        }
+      }
+      exam_results: {
+        Row: {
+          id: string
+          student_id: string
+          exam_id: string
+          score: number
+          passed: boolean
+          answers: Json
+          completed_at: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          student_id: string
+          exam_id: string
+          score: number
+          passed: boolean
+          answers: Json
+          completed_at: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          student_id?: string
+          exam_id?: string
+          score?: number
+          passed?: boolean
+          answers?: Json
+          completed_at?: string
+          created_at?: string
+        }
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      increment_comment_count: {
+        Args: { post_id: string }
+        Returns: void
+      }
+      increment_reaction_count: {
+        Args: { post_id: string }
+        Returns: void
+      }
+      decrement_reaction_count: {
+        Args: { post_id: string }
+        Returns: void
+      }
     }
     Enums: {
       [_ in never]: never

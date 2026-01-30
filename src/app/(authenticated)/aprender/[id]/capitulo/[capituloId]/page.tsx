@@ -275,7 +275,7 @@ export default function ChapterPlayerPage() {
     } finally {
       setIsSaving(false);
     }
-  }, [student?.id, token, chapterId, courseId, chapter, course, allChapters, currentChapterIndex, showXpGain, isSaving]);
+  }, [student?.id, token, chapterId, courseId, chapter, course, allChapters, currentChapterIndex, showXpGain, isSaving, userTimezone]);
 
   // Auto-save progress periodically while playing
   useEffect(() => {

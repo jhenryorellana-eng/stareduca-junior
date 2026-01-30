@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
 import { cn } from '@/lib/utils';
@@ -22,6 +22,7 @@ interface Exam {
   course_id: string;
 }
 
+
 export default function ExamenPage() {
   const router = useRouter();
   const params = useParams();
@@ -42,11 +43,7 @@ export default function ExamenPage() {
     ? Intl.DateTimeFormat().resolvedOptions().timeZone
     : 'America/Lima';
 
-  useEffect(() => {
-    fetchExamData();
-  }, [courseId]);
-
-  async function fetchExamData() {
+  const fetchExamData = useCallback(async () => {
     try {
       // Fetch exam
       const { data: examData, error: examError } = await supabase
@@ -57,17 +54,20 @@ export default function ExamenPage() {
         .single();
 
       if (examError) throw examError;
-      setExam(examData);
+      if (!examData) throw new Error('Exam not found');
+
+      const typedExamData = examData as Exam;
+      setExam(typedExamData);
 
       // Fetch questions
       const { data: questionsData, error: questionsError } = await supabase
         .from('exam_questions')
         .select('*')
-        .eq('exam_id', examData.id)
+        .eq('exam_id', typedExamData.id)
         .order('order_index');
 
       if (questionsError) throw questionsError;
-      setQuestions(questionsData || []);
+      setQuestions((questionsData as Question[]) || []);
 
       if (!questionsData || questionsData.length === 0) {
         setError('Este examen no tiene preguntas configuradas');
@@ -78,7 +78,11 @@ export default function ExamenPage() {
     } finally {
       setIsLoading(false);
     }
-  }
+  }, [courseId]);
+
+  useEffect(() => {
+    fetchExamData();
+  }, [fetchExamData]);
 
   const currentQuestion = questions[currentQuestionIndex];
 
@@ -120,15 +124,17 @@ export default function ExamenPage() {
       const percentage = Math.round((correctCount / totalQuestions) * 100);
       const passed = percentage >= exam.passing_score;
 
-      // Save exam result to database
-      const { error: resultError } = await supabase.from('exam_results').insert({
-        student_id: student.id,
-        exam_id: exam.id,
-        score: correctCount,
-        passed,
-        answers: answers,
-        completed_at: new Date().toISOString(),
-      });
+      // Save exam result to database (using any to bypass Supabase type generation issues)
+      const { error: resultError } = await (supabase as unknown as { from: (table: string) => { insert: (data: Record<string, unknown>) => Promise<{ error: unknown }> } })
+        .from('exam_results')
+        .insert({
+          student_id: student.id,
+          exam_id: exam.id,
+          score: correctCount,
+          passed,
+          answers: answers,
+          completed_at: new Date().toISOString(),
+        });
 
       if (resultError) {
         console.error('Error saving exam result:', resultError);

@@ -67,6 +67,7 @@ export default function CourseDetailPage() {
           .single();
 
         if (courseError) throw courseError;
+        if (!courseData) throw new Error('Course not found');
 
         // Fetch chapters (lessons with course_id)
         const { data: chaptersData, error: chaptersError } = await supabase
@@ -77,9 +78,10 @@ export default function CourseDetailPage() {
 
         if (chaptersError) throw chaptersError;
 
+        const typedCourseData = courseData as Omit<Course, 'chapters'>;
         setCourse({
-          ...courseData,
-          chapters: chaptersData || [],
+          ...typedCourseData,
+          chapters: (chaptersData as Chapter[]) || [],
         });
 
         // Fetch exam
@@ -91,7 +93,7 @@ export default function CourseDetailPage() {
           .single();
 
         if (examData) {
-          setExam(examData);
+          setExam(examData as Exam);
         }
       } catch (err: any) {
         console.error('Error fetching course:', err);
@@ -119,12 +121,10 @@ export default function CourseDetailPage() {
         if (response.ok) {
           const data = await response.json();
           if (data.lessonProgress) {
-            const completed = new Set(
-              data.lessonProgress
-                .filter((p: { is_completed: boolean }) => p.is_completed)
-                .map((p: { lesson_id: string }) => p.lesson_id)
-            );
-            setCompletedChapters(completed);
+            const completedIds: string[] = data.lessonProgress
+              .filter((p: { is_completed: boolean }) => p.is_completed)
+              .map((p: { lesson_id: string }) => p.lesson_id);
+            setCompletedChapters(new Set(completedIds));
           }
           if (data.examResult) {
             setExamResult(data.examResult);

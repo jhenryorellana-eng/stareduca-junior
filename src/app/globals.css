@@ -2,8 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap');
-
 :root {
   --primary: #895af6;
   --primary-glow: rgba(137, 90, 246, 0.4);
@@ -12,7 +10,7 @@
 
 @layer base {
   html {
-    font-family: 'Quicksand', sans-serif;
+    font-family: var(--font-quicksand), 'Quicksand', sans-serif;
   }
 
   body {
@@ -22,7 +20,7 @@
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Quicksand', sans-serif;
+    font-family: var(--font-quicksand), 'Quicksand', sans-serif;
     @apply font-bold;
   }
 }

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient } from '@/lib/supabase/server';
+import { createServerClient, createUntypedServerClient } from '@/lib/supabase/server';
 import { getAuthFromRequest, unauthorizedResponse } from '@/lib/auth';
 import { getLevelTitle } from '@/lib/utils';
 import type { CommunityComment } from '@/types';
@@ -119,19 +119,19 @@ export async function POST(
     );
   }
 
-  const supabase = createServerClient();
+  // Using untyped client to bypass Supabase type generation issues
+  const supabase = createUntypedServerClient();
 
   // Verify post exists and get owner
   const { data: post } = await supabase
     .from('posts')
     .select('id, student_id')
     .eq('id', postId)
-    .single();
+    .single() as { data: { id: string; student_id: string } | null };
 
   if (!post) {
     return NextResponse.json({ error: 'Publicación no encontrada' }, { status: 404 });
   }
-
   // Create comment
   const { data: newComment, error: commentError } = await supabase
     .from('comments')
@@ -156,7 +156,7 @@ export async function POST(
     .from('students')
     .select('id, first_name, last_name, avatar_url, current_level')
     .eq('id', auth.sub)
-    .single();
+    .single() as { data: { id: string; first_name: string; last_name: string; avatar_url: string | null; current_level: number } | null };
 
   const comment: CommunityComment = {
     id: newComment.id,
@@ -167,7 +167,7 @@ export async function POST(
       id: student?.id || auth.sub,
       firstName: student?.first_name || auth.first_name,
       lastName: student?.last_name || '',
-      avatarUrl: student?.avatar_url,
+      avatarUrl: student?.avatar_url ?? undefined,
       level: student?.current_level || 1,
       levelName: getLevelTitle(student?.current_level || 1),
     },

@@ -123,6 +123,8 @@ export const useUserStore = create<UserState>((set, get) => ({
   showXpToast: false,
   xpToastAmount: 0,
   xpToastReason: '',
+  showBadgeToast: false,
+  badgeToastData: null,
 
   setGamificationData: (data) => {
     const levelData = calculateLevelData(data.xpTotal);
