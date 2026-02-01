@@ -30,6 +30,7 @@ function getNotificationIcon(type: string): string {
     comment: 'chat_bubble',
     reaction: 'favorite',
     mention: 'alternate_email',
+    course: 'auto_stories',
   };
   return icons[type] || 'notifications';
 }
@@ -43,6 +44,7 @@ function getNotificationIconColor(type: string): string {
     comment: 'text-blue-400',
     reaction: 'text-pink-400',
     mention: 'text-primary/60',
+    course: 'text-purple-400',
   };
   return colors[type] || 'text-slate-400';
 }
@@ -146,6 +148,25 @@ export default function AvisosPage() {
     }
   };
 
+  const markAllAsRead = async () => {
+    // Optimistic update
+    setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
+
+    // Update in backend
+    try {
+      await fetch('/api/notifications', {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ markAll: true }),
+      });
+    } catch (error) {
+      console.error('Error marking all as read:', error);
+    }
+  };
+
   // Group notifications by day
   const todayNotifications = notifications.filter((n) => isToday(n.createdAt));
   const yesterdayNotifications = notifications.filter((n) => isYesterday(n.createdAt));
@@ -166,9 +187,19 @@ export default function AvisosPage() {
           >
             <Icon name="arrow_back" size={22} className="text-slate-400 group-hover:text-primary transition-colors" />
           </button>
-          <h1 className="text-slate-900 text-xl font-semibold tracking-tight flex-1 text-center pr-10">
+          <h1 className="text-slate-900 text-xl font-semibold tracking-tight flex-1 text-center">
             Notificaciones
           </h1>
+          {unreadCount > 0 ? (
+            <button
+              onClick={markAllAsRead}
+              className="text-primary text-sm font-semibold whitespace-nowrap"
+            >
+              Marcar todo
+            </button>
+          ) : (
+            <div className="w-10" />
+          )}
         </div>
       </header>
 
