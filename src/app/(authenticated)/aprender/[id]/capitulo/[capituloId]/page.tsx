@@ -335,6 +335,7 @@ export default function ChapterPlayerPage() {
   };
 
   const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation();
     if (videoRef.current) {
       const rect = e.currentTarget.getBoundingClientRect();
       const percent = (e.clientX - rect.left) / rect.width;
@@ -486,13 +487,18 @@ export default function ChapterPlayerPage() {
                   setVideoError(null);
                 }}
                 onPlay={() => {
+                  console.log('[VIDEO] Play event fired');
                   setIsPlaying(true);
                   setVideoError(null);
                 }}
-                onPause={() => setIsPlaying(false)}
+                onPause={() => {
+                  console.log('[VIDEO] Pause event fired');
+                  setIsPlaying(false);
+                }}
                 onEnded={handleVideoEnded}
                 onError={(e) => {
                   const error = e.currentTarget.error;
+                  console.log('[VIDEO] Error event:', error);
                   setIsVideoLoading(false);
                   if (error?.code === MediaError.MEDIA_ERR_NETWORK) {
                     setVideoError('Error de red. Verifica tu conexión.');
@@ -536,15 +542,15 @@ export default function ChapterPlayerPage() {
                 </div>
               )}
               {/* Dark Overlay when paused */}
-              {!isPlaying && (
-                <div className="absolute inset-0 bg-black/40" />
+              {!isPlaying && !isVideoLoading && !videoError && (
+                <div className="absolute inset-0 bg-black/40 pointer-events-none" />
               )}
               {/* Center Play Button */}
               <button
                 onClick={togglePlay}
                 className={cn(
                   'absolute inset-0 flex items-center justify-center transition-opacity',
-                  isPlaying ? 'opacity-0 hover:opacity-100' : 'opacity-100'
+                  isPlaying ? 'opacity-0 pointer-events-none' : 'opacity-100'
                 )}
               >
                 <div className="w-16 h-16 rounded-full bg-primary text-white shadow-xl flex items-center justify-center hover:scale-105 transition-transform">
