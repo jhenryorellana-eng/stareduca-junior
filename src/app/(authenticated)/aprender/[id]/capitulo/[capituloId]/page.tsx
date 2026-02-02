@@ -51,6 +51,8 @@ export default function ChapterPlayerPage() {
   const [progress, setProgress] = useState(0);
   const [isCompleted, setIsCompleted] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [videoError, setVideoError] = useState<string | null>(null);
+  const [isVideoLoading, setIsVideoLoading] = useState(true);
 
   const [chapter, setChapter] = useState<Chapter | null>(null);
   const [course, setCourse] = useState<Course | null>(null);
@@ -315,14 +317,20 @@ export default function ChapterPlayerPage() {
     }
   };
 
-  const togglePlay = () => {
+  const togglePlay = async () => {
     if (videoRef.current) {
       if (isPlaying) {
         videoRef.current.pause();
       } else {
-        videoRef.current.play();
+        try {
+          await videoRef.current.play();
+        } catch (error) {
+          console.error('Error al reproducir video:', error);
+          if (error instanceof DOMException && error.name === 'NotAllowedError') {
+            setVideoError('Toca el video para reproducir');
+          }
+        }
       }
-      setIsPlaying(!isPlaying);
     }
   };
 
@@ -468,13 +476,58 @@ export default function ChapterPlayerPage() {
                 ref={videoRef}
                 src={chapter.video_url}
                 className="w-full h-full object-contain"
+                crossOrigin="anonymous"
+                preload="metadata"
+                playsInline
                 onTimeUpdate={handleTimeUpdate}
                 onLoadedMetadata={handleLoadedMetadata}
-                onPlay={() => setIsPlaying(true)}
+                onCanPlay={() => {
+                  setIsVideoLoading(false);
+                  setVideoError(null);
+                }}
+                onPlay={() => {
+                  setIsPlaying(true);
+                  setVideoError(null);
+                }}
                 onPause={() => setIsPlaying(false)}
                 onEnded={handleVideoEnded}
-                playsInline
+                onError={(e) => {
+                  const error = e.currentTarget.error;
+                  setIsVideoLoading(false);
+                  if (error?.code === MediaError.MEDIA_ERR_NETWORK) {
+                    setVideoError('Error de red. Verifica tu conexión.');
+                  } else if (error?.code === MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED) {
+                    setVideoError('Formato de video no soportado.');
+                  } else {
+                    setVideoError('Error al cargar el video.');
+                  }
+                }}
               />
+              {/* Video Loading Indicator */}
+              {isVideoLoading && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black/60">
+                  <div className="w-10 h-10 border-3 border-white border-t-transparent rounded-full animate-spin" />
+                </div>
+              )}
+              {/* Video Error Message */}
+              {videoError && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black/70">
+                  <div className="flex flex-col items-center gap-3 px-6 text-center">
+                    <Icon name="error" size={40} className="text-red-400" />
+                    <p className="text-white font-medium">{videoError}</p>
+                    <button
+                      onClick={() => {
+                        setVideoError(null);
+                        setIsVideoLoading(true);
+                        videoRef.current?.load();
+                      }}
+                      className="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg text-white text-sm font-medium transition-colors"
+                    >
+                      Reintentar
+                    </button>
+                  </div>
+                </div>
+              )}
               {/* Completed Badge */}
               {isCompleted && (
                 <div className="absolute top-4 right-4 bg-green-500 text-white px-3 py-1.5 rounded-full text-sm font-bold flex items-center gap-1 shadow-lg">
