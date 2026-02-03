@@ -72,7 +72,7 @@ export default function ChapterPlayerPage() {
 
   // Número de módulo y capítulo dentro de su módulo (no global)
   const moduleNumber = chapter
-    ? [...new Set(allChapters.map(ch => ch.module_id))].indexOf(chapter.module_id) + 1
+    ? Array.from(new Set(allChapters.map(ch => ch.module_id))).indexOf(chapter.module_id) + 1
     : 1;
   const chapterNumberInModule = chapter
     ? allChapters
