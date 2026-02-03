@@ -15,8 +15,8 @@ const DEV_STUDENT = {
 };
 
 export async function POST() {
-  // Solo permitir en desarrollo
-  if (process.env.NODE_ENV !== 'development') {
+  // Solo permitir en desarrollo o si NEXT_PUBLIC_ENABLE_DEV_LOGIN está habilitado
+  if (process.env.NODE_ENV !== 'development' && process.env.NEXT_PUBLIC_ENABLE_DEV_LOGIN !== 'true') {
     return NextResponse.json(
       { error: 'Dev login solo disponible en desarrollo' },
       { status: 403 }
