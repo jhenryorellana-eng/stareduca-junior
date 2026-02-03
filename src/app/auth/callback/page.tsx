@@ -13,13 +13,15 @@ function AuthCallbackContent() {
   const [isLoading, setIsLoading] = useState(true);
   const [showDevLogin, setShowDevLogin] = useState(false);
   const [devLoading, setDevLoading] = useState(false);
-  const [isDev, setIsDev] = useState(false);
 
-  // Detectar si estamos en localhost
-  useEffect(() => {
+  // Detectar localhost de forma sincrónica (maneja SSR)
+  const getIsLocalhost = () => {
+    if (typeof window === 'undefined') return false;
     const hostname = window.location.hostname;
-    setIsDev(hostname === 'localhost' || hostname === '127.0.0.1');
-  }, []);
+    return hostname === 'localhost' || hostname === '127.0.0.1';
+  };
+
+  const [isDev] = useState(getIsLocalhost);
 
   // Dev login function
   const handleDevLogin = async () => {
