@@ -48,7 +48,7 @@ export default function AprenderPage() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // OPTIMIZADO: Una sola llamada API con todos los datos
+  // OPTIMIZADO: Una sola llamada API con todos los datos + polling cada 30s
   useEffect(() => {
     async function fetchCourses() {
       if (!token) return;
@@ -88,6 +88,10 @@ export default function AprenderPage() {
     }
 
     fetchCourses();
+
+    // Polling cada 30 segundos para sincronizar cambios del admin
+    const interval = setInterval(fetchCourses, 30000);
+    return () => clearInterval(interval);
   }, [token]);
 
   const getCategoryColor = (category: string) => {
