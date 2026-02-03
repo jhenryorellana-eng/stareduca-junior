@@ -5,8 +5,6 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore } from '@/stores/auth-store';
 import { Icon } from '@/components/ui/Icon';
 
-const isDev = process.env.NODE_ENV === 'development' || process.env.NEXT_PUBLIC_ENABLE_DEV_LOGIN === 'true';
-
 function AuthCallbackContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -15,6 +13,13 @@ function AuthCallbackContent() {
   const [isLoading, setIsLoading] = useState(true);
   const [showDevLogin, setShowDevLogin] = useState(false);
   const [devLoading, setDevLoading] = useState(false);
+  const [isDev, setIsDev] = useState(false);
+
+  // Detectar si estamos en localhost
+  useEffect(() => {
+    const hostname = window.location.hostname;
+    setIsDev(hostname === 'localhost' || hostname === '127.0.0.1');
+  }, []);
 
   // Dev login function
   const handleDevLogin = async () => {

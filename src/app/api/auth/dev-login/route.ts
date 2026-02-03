@@ -14,11 +14,14 @@ const DEV_STUDENT = {
   family_id: 'dev-family-001',
 };
 
-export async function POST() {
-  // Solo permitir en desarrollo o si NEXT_PUBLIC_ENABLE_DEV_LOGIN está habilitado
-  if (process.env.NODE_ENV !== 'development' && process.env.NEXT_PUBLIC_ENABLE_DEV_LOGIN !== 'true') {
+export async function POST(request: Request) {
+  // Solo permitir en localhost (desarrollo local)
+  const host = request.headers.get('host') || '';
+  const isLocalhost = host.includes('localhost') || host.includes('127.0.0.1');
+
+  if (!isLocalhost) {
     return NextResponse.json(
-      { error: 'Dev login solo disponible en desarrollo' },
+      { error: 'Dev login solo disponible en localhost' },
       { status: 403 }
     );
   }
