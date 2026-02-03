@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
 
   const supabase = createServerClient();
 
-  // 1. Obtener cursos CON lecciones en una sola query (JOIN)
+  // 1. Obtener cursos CON módulos y lecciones (courses → modules → lessons)
   let query = supabase
     .from('courses')
     .select(`
@@ -27,7 +27,9 @@ export async function GET(request: NextRequest) {
       xp_reward,
       is_published,
       created_at,
-      lessons(id, duration_minutes)
+      modules(
+        lessons(id, duration_minutes)
+      )
     `)
     .eq('is_published', true)
     .order('created_at', { ascending: false });
@@ -56,7 +58,9 @@ export async function GET(request: NextRequest) {
   // 3. Combinar datos con duración calculada y isCompleted
   let result = coursesData.map((course: any) => {
     const enrollment = enrollmentMap.get(course.id);
-    const lessons = course.lessons || [];
+    // Extraer lecciones de todos los módulos (courses → modules → lessons)
+    const modules = course.modules || [];
+    const lessons = modules.flatMap((m: any) => m.lessons || []);
     const totalDuration = lessons.reduce((sum: number, l: any) => sum + (l.duration_minutes || 0), 0);
     const lessonsCount = lessons.length;
 
