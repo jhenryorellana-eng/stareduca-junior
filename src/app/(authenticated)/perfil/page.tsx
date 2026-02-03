@@ -47,8 +47,9 @@ export default function PerfilPage() {
 
       try {
         // Usar API route que bypasa RLS
-        const response = await fetch('/api/courses', {
+        const response = await fetch(`/api/courses?_t=${Date.now()}`, {
           headers: { 'Authorization': `Bearer ${token}` },
+          cache: 'no-store',
         });
 
         if (!response.ok) {
@@ -58,22 +59,16 @@ export default function PerfilPage() {
 
         const { courses } = await response.json();
 
-        // Filtrar cursos completados
-        const completedList = courses.filter((c: any) => c.enrollmentStatus === 'completed');
+        // Cursos completados
+        const completedList = courses.filter((c: any) => c.isCompleted);
         setCompletedCourses(completedList.length);
 
-        // Calcular tiempo total de cursos completados
-        if (completedList.length > 0) {
-          let totalMins = 0;
-          for (const course of completedList) {
-            const { data: lessons } = await supabase
-              .from('lessons')
-              .select('duration_minutes')
-              .eq('course_id', course.id);
-            totalMins += lessons?.reduce((sum: number, l: any) => sum + (l.duration_minutes || 0), 0) || 0;
-          }
-          setTotalMinutes(totalMins);
-        }
+        // Tiempo total = duración de capítulos completados de todos los cursos inscritos
+        const enrolledCourses = courses.filter((c: any) => c.isEnrolled);
+        const totalMins = enrolledCourses.reduce(
+          (sum: number, c: any) => sum + (c.completedDuration || 0), 0
+        );
+        setTotalMinutes(totalMins);
       } catch (error) {
         console.error('Error fetching profile stats:', error);
       }

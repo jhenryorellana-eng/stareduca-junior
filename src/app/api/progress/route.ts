@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { createServerClient } from '@/lib/supabase/server';
 import { getAuthFromRequest, unauthorizedResponse } from '@/lib/auth';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+// Forzar que esta ruta sea dinámica y sin cache
+export const dynamic = 'force-dynamic';
+export const fetchCache = 'force-no-store';
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,8 +18,8 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { lessonId, courseId, watchTimeSeconds, isCompleted, markCourseCompleted } = body;
 
-    // Use service role client for database operations
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    // Use service role client for database operations (with cache: no-store)
+    const supabase = createServerClient();
 
     // Handle marking course as completed (from exam pass)
     if (markCourseCompleted && courseId) {
@@ -102,11 +103,18 @@ export async function POST(request: NextRequest) {
       // We'll handle this on the client side with the XpToast
 
       // Update enrollment progress_percent
-      // First, get total lessons in this course
+      // First, get modules for this course, then lessons
+      const { data: modules } = await supabase
+        .from('modules')
+        .select('id')
+        .eq('course_id', courseId);
+
+      const moduleIds = modules?.map((m) => m.id) || [];
+
       const { data: lessons } = await supabase
         .from('lessons')
         .select('id')
-        .eq('course_id', courseId);
+        .in('module_id', moduleIds);
 
       const totalLessons = lessons?.length || 0;
 
@@ -191,13 +199,20 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const supabase = createServerClient();
 
-    // Get lessons for this course
+    // Get modules for this course, then lessons
+    const { data: modules } = await supabase
+      .from('modules')
+      .select('id')
+      .eq('course_id', courseId);
+
+    const moduleIds = modules?.map((m) => m.id) || [];
+
     const { data: lessons } = await supabase
       .from('lessons')
       .select('id')
-      .eq('course_id', courseId);
+      .in('module_id', moduleIds);
 
     const lessonIds = lessons?.map((l) => l.id) || [];
 

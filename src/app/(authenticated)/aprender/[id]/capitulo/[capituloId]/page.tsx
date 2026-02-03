@@ -25,6 +25,7 @@ interface Chapter {
   duration_minutes: number | null;
   xp_reward: number;
   order_index: number;
+  module_id: string;
   course_id: string;
 }
 
@@ -53,6 +54,10 @@ export default function ChapterPlayerPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [videoError, setVideoError] = useState<string | null>(null);
   const [isVideoLoading, setIsVideoLoading] = useState(true);
+  const [volume, setVolume] = useState(1);
+  const [isMuted, setIsMuted] = useState(false);
+  const [showVolumeSlider, setShowVolumeSlider] = useState(false);
+  const volumeRef = useRef<HTMLDivElement>(null);
 
   const [chapter, setChapter] = useState<Chapter | null>(null);
   const [course, setCourse] = useState<Course | null>(null);
@@ -64,6 +69,16 @@ export default function ChapterPlayerPage() {
   const currentChapterIndex = allChapters.findIndex(ch => ch.id === chapterId);
   const prevChapter = currentChapterIndex > 0 ? allChapters[currentChapterIndex - 1] : null;
   const nextChapter = currentChapterIndex < allChapters.length - 1 ? allChapters[currentChapterIndex + 1] : null;
+
+  // Número de módulo y capítulo dentro de su módulo (no global)
+  const moduleNumber = chapter
+    ? [...new Set(allChapters.map(ch => ch.module_id))].indexOf(chapter.module_id) + 1
+    : 1;
+  const chapterNumberInModule = chapter
+    ? allChapters
+        .filter(ch => ch.module_id === chapter.module_id)
+        .findIndex(ch => ch.id === chapterId) + 1
+    : currentChapterIndex + 1;
 
   // Get user's timezone for streak calculation
   const userTimezone = typeof window !== 'undefined'
@@ -93,14 +108,41 @@ export default function ChapterPlayerPage() {
         if (courseError) throw courseError;
         setCourse(courseData);
 
-        // Fetch all chapters for navigation
-        const { data: chaptersData, error: chaptersError } = await supabase
-          .from('lessons')
-          .select('*')
+        // Fetch all chapters for navigation (lessons are linked through modules)
+        const { data: modulesData } = await supabase
+          .from('modules')
+          .select('id')
           .eq('course_id', courseId)
           .order('order_index');
 
+        const moduleIds = (modulesData as { id: string }[] | null)?.map((m) => m.id) || [];
+
+        let chaptersData: any[] = [];
+        let chaptersError: any = null;
+
+        if (moduleIds.length > 0) {
+          const result = await supabase
+            .from('lessons')
+            .select('*')
+            .in('module_id', moduleIds)
+            .order('order_index');
+          chaptersData = result.data || [];
+          chaptersError = result.error;
+        }
+
         if (chaptersError) throw chaptersError;
+
+        // Ordenar lecciones: primero por orden del módulo, luego por order_index
+        const moduleOrderMap = new Map(
+          (modulesData || []).map((m: any, i: number) => [m.id, i])
+        );
+        chaptersData.sort((a: any, b: any) => {
+          const moduleOrderA = moduleOrderMap.get(a.module_id) ?? 0;
+          const moduleOrderB = moduleOrderMap.get(b.module_id) ?? 0;
+          if (moduleOrderA !== moduleOrderB) return moduleOrderA - moduleOrderB;
+          return a.order_index - b.order_index;
+        });
+
         setAllChapters(chaptersData || []);
 
         // Fetch materials
@@ -161,7 +203,7 @@ export default function ChapterPlayerPage() {
 
   // Save progress function
   const saveProgress = useCallback(async (watchTime: number, completed: boolean = false) => {
-    if (!student?.id || !token || isSaving) return;
+    if (!student?.id || !token || (!completed && isSaving)) return;
 
     // Debounce - only save if 5+ seconds since last save (unless completing)
     const now = Date.now();
@@ -334,6 +376,39 @@ export default function ChapterPlayerPage() {
     }
   };
 
+  // Cerrar slider de volumen al tocar fuera
+  useEffect(() => {
+    if (!showVolumeSlider) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (volumeRef.current && !volumeRef.current.contains(e.target as Node)) {
+        setShowVolumeSlider(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('touchstart', handleClickOutside as any);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside as any);
+    };
+  }, [showVolumeSlider]);
+
+  const toggleMute = () => {
+    if (videoRef.current) {
+      videoRef.current.muted = !isMuted;
+      setIsMuted(!isMuted);
+    }
+  };
+
+  const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = parseFloat(e.target.value);
+    setVolume(val);
+    if (videoRef.current) {
+      videoRef.current.volume = val;
+      videoRef.current.muted = val === 0;
+      setIsMuted(val === 0);
+    }
+  };
+
   const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
     if (videoRef.current) {
@@ -462,7 +537,7 @@ export default function ChapterPlayerPage() {
             <Icon name="arrow_back" size={24} />
           </button>
           <div className="text-white text-sm font-bold tracking-wide uppercase opacity-80">
-            Capitulo {currentChapterIndex + 1}
+            Módulo {moduleNumber} - Capítulo {chapterNumberInModule}
           </div>
           <button className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm text-white flex items-center justify-center">
             <Icon name="more_vert" size={24} />
@@ -545,18 +620,27 @@ export default function ChapterPlayerPage() {
               {!isPlaying && !isVideoLoading && !videoError && (
                 <div className="absolute inset-0 bg-black/40 pointer-events-none" />
               )}
-              {/* Center Play Button */}
+              {/* Center Play/Pause Button - clickable area covers video */}
               <button
                 onClick={togglePlay}
                 className={cn(
                   'absolute inset-0 flex items-center justify-center transition-opacity',
-                  isPlaying ? 'opacity-0 pointer-events-none' : 'opacity-100'
+                  isPlaying ? 'opacity-0 group-hover:opacity-100' : 'opacity-100'
                 )}
               >
                 <div className="w-16 h-16 rounded-full bg-primary text-white shadow-xl flex items-center justify-center hover:scale-105 transition-transform">
                   <Icon name={isPlaying ? 'pause' : 'play_arrow'} size={32} filled={true} />
                 </div>
               </button>
+              {/* Floating Play/Pause Button - always accessible on hover */}
+              {!isVideoLoading && !videoError && (
+                <button
+                  onClick={togglePlay}
+                  className="absolute bottom-16 left-4 w-10 h-10 rounded-full bg-black/60 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                >
+                  <Icon name={isPlaying ? 'pause' : 'play_arrow'} size={24} />
+                </button>
+              )}
               {/* Video Controls */}
               <div className="absolute inset-x-0 bottom-0 px-4 py-3">
                 {/* Progress Bar */}
@@ -581,7 +665,38 @@ export default function ChapterPlayerPage() {
                   <p className="text-white text-xs font-medium tracking-wide font-mono">
                     {formatTime(currentTime)} / {formatTime(duration)}
                   </p>
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    {/* Volume Control */}
+                    <div ref={volumeRef} className="relative flex items-center">
+                      <button
+                        onClick={() => setShowVolumeSlider(!showVolumeSlider)}
+                        className="text-white/80 hover:text-white"
+                      >
+                        <Icon
+                          name={isMuted || volume === 0 ? 'volume_off' : volume < 0.5 ? 'volume_down' : 'volume_up'}
+                          size={20}
+                        />
+                      </button>
+                      {showVolumeSlider && (
+                        <div className="absolute bottom-8 right-0 bg-black/80 backdrop-blur-sm rounded-lg px-3 py-2 flex items-center gap-2">
+                          <button onClick={toggleMute} className="text-white/80 hover:text-white shrink-0">
+                            <Icon
+                              name={isMuted || volume === 0 ? 'volume_off' : 'volume_up'}
+                              size={18}
+                            />
+                          </button>
+                          <input
+                            type="range"
+                            min="0"
+                            max="1"
+                            step="0.05"
+                            value={isMuted ? 0 : volume}
+                            onChange={handleVolumeChange}
+                            className="w-24 h-1.5 accent-primary appearance-none bg-white/30 rounded-full cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:shadow-md"
+                          />
+                        </div>
+                      )}
+                    </div>
                     <button className="text-white/80 hover:text-white">
                       <Icon name="fullscreen" size={20} />
                     </button>
@@ -692,21 +807,41 @@ export default function ChapterPlayerPage() {
             </Link>
           )}
           {nextChapter ? (
-            <Link
-              href={`/aprender/${courseId}/capitulo/${nextChapter.id}`}
-              className="flex-[2] h-12 rounded-xl bg-primary hover:bg-primary-dark text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-primary/30 transition-all active:scale-95"
-            >
-              Siguiente
-              <Icon name="chevron_right" size={20} />
-            </Link>
+            isCompleted ? (
+              <Link
+                href={`/aprender/${courseId}/capitulo/${nextChapter.id}`}
+                className="flex-[2] h-12 rounded-xl bg-primary hover:bg-primary-dark text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-primary/30 transition-all active:scale-95"
+              >
+                Siguiente
+                <Icon name="chevron_right" size={20} />
+              </Link>
+            ) : (
+              <button
+                disabled
+                className="flex-[2] h-12 rounded-xl bg-primary/40 text-white/60 font-bold text-sm flex items-center justify-center gap-2 cursor-not-allowed"
+              >
+                Siguiente
+                <Icon name="lock" size={18} />
+              </button>
+            )
           ) : (
-            <Link
-              href={`/aprender/${courseId}`}
-              className="flex-[2] h-12 rounded-xl bg-green-500 hover:bg-green-600 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-green-500/30 transition-all active:scale-95"
-            >
-              Completar Curso
-              <Icon name="check" size={20} />
-            </Link>
+            isCompleted ? (
+              <Link
+                href={`/aprender/${courseId}`}
+                className="flex-[2] h-12 rounded-xl bg-green-500 hover:bg-green-600 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-green-500/30 transition-all active:scale-95"
+              >
+                Completar Curso
+                <Icon name="check" size={20} />
+              </Link>
+            ) : (
+              <button
+                disabled
+                className="flex-[2] h-12 rounded-xl bg-green-500/40 text-white/60 font-bold text-sm flex items-center justify-center gap-2 cursor-not-allowed"
+              >
+                Completar Curso
+                <Icon name="lock" size={18} />
+              </button>
+            )
           )}
         </div>
         {/* iOS Home Indicator Space */}

@@ -54,8 +54,9 @@ export default function AprenderPage() {
       if (!token) return;
 
       try {
-        const response = await fetch('/api/courses', {
+        const response = await fetch(`/api/courses?_t=${Date.now()}`, {
           headers: { 'Authorization': `Bearer ${token}` },
+          cache: 'no-store',
         });
 
         if (!response.ok) {

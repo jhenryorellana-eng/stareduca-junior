@@ -50,8 +50,9 @@ export default function HomePage() {
 
       try {
         // Una sola llamada - incluye duración, lessonsCount, isCompleted
-        const response = await fetch('/api/courses', {
+        const response = await fetch(`/api/courses?_t=${Date.now()}`, {
           headers: { 'Authorization': `Bearer ${token}` },
+          cache: 'no-store',
         });
 
         if (!response.ok) {
