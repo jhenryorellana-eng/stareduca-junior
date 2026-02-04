@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuthStore } from '@/stores/auth-store';
 import { useUserStore } from '@/stores/user-store';
+import { useSuperAppBridge } from '@/hooks/use-super-app-bridge';
 import { BottomNav } from '@/components/layout';
 import { XpToast, BadgeToast } from '@/components/gamification';
 
@@ -16,6 +17,7 @@ export default function AuthenticatedLayout({
   const pathname = usePathname();
   const { isAuthenticated, isLoading, loadFromStorage, student, token } = useAuthStore();
   const { setGamificationData, setBadges } = useUserStore();
+  const { isInWebView } = useSuperAppBridge();
 
   // Ocultar la barra de navegación en páginas de detalle de curso y capítulos
   // /aprender → mostrar, /aprender/[id] → ocultar, /aprender/[id]/capitulo/[x] → ocultar
@@ -89,7 +91,7 @@ export default function AuthenticatedLayout({
   }
 
   return (
-    <div className={`min-h-screen bg-background-light ${!shouldHideNav ? 'pb-[calc(5rem+env(safe-area-inset-bottom))]' : ''}`}>
+    <div className={`min-h-screen bg-background-light ${!shouldHideNav ? (isInWebView ? 'pb-20' : 'pb-[calc(5rem+env(safe-area-inset-bottom))]') : ''}`}>
       {/* XP Toast for gamification feedback */}
       <XpToast />
       {/* Badge Toast for badge earned feedback */}

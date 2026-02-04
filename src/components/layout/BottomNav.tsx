@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useUserStore } from '@/stores/user-store';
+import { useSuperAppBridge } from '@/hooks/use-super-app-bridge';
 import { Icon } from '@/components/ui/Icon';
 
 const tabs = [
@@ -17,6 +18,7 @@ const tabs = [
 export function BottomNav() {
   const pathname = usePathname();
   const unreadCount = useUserStore((state) => state.unreadCount);
+  const { isInWebView } = useSuperAppBridge();
 
   const isActive = (href: string) => {
     if (href === '/') return pathname === '/';
@@ -24,7 +26,10 @@ export function BottomNav() {
   };
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 rounded-t-4xl bg-white shadow-[0_-4px_20px_rgba(0,0,0,0.05)] border-t border-gray-100 pb-[env(safe-area-inset-bottom)]">
+    <nav className={cn(
+      "fixed bottom-0 left-0 right-0 z-50 rounded-t-4xl bg-white shadow-[0_-4px_20px_rgba(0,0,0,0.05)] border-t border-gray-100",
+      !isInWebView && "pb-[env(safe-area-inset-bottom)]"
+    )}>
       <div className="flex h-20 w-full items-center justify-around px-2 pb-2">
         {tabs.map((tab) => {
           const active = isActive(tab.href);
