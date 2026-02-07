@@ -32,7 +32,7 @@ export function StreakDisplay({ variant = 'compact', className }: StreakDisplayP
   }
 
   return (
-    <div className={cn('bg-gradient-to-br from-orange-400 to-orange-500 rounded-3xl p-5 text-white', className)}>
+    <div className={cn('bg-gradient-to-br from-orange-400 to-orange-500 rounded-3xl p-5 tablet:p-6 text-white', className)}>
       <div className="flex items-center justify-between mb-4">
         <div>
           <p className="text-white/70 text-sm">Racha actual</p>

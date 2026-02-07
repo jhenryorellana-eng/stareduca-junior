@@ -133,7 +133,7 @@ export function CreatePostModal({
       />
 
       {/* Modal */}
-      <div className="relative w-full sm:max-w-md bg-white rounded-t-2xl sm:rounded-2xl shadow-xl animate-slide-up max-h-[80vh] flex flex-col">
+      <div className="relative w-full sm:max-w-md tablet:max-w-lg bg-white rounded-t-2xl sm:rounded-2xl shadow-xl animate-slide-up max-h-[80vh] flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
           <button

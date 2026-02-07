@@ -180,7 +180,7 @@ export default function AvisosPage() {
     <div className="min-h-screen flex flex-col pb-24 text-slate-800 bg-white">
       {/* Header */}
       <header className="sticky top-0 z-20 bg-white/80 backdrop-blur-md">
-        <div className="flex items-center p-6 justify-between max-w-md mx-auto">
+        <div className="flex items-center p-6 justify-between max-w-md tablet:max-w-2xl mx-auto">
           <button
             onClick={() => router.back()}
             className="flex w-10 h-10 items-center justify-start cursor-pointer group"
@@ -204,7 +204,7 @@ export default function AvisosPage() {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 w-full max-w-md mx-auto px-6 space-y-8">
+      <main className="flex-1 w-full max-w-md tablet:max-w-2xl mx-auto px-6 tablet:px-8 space-y-8">
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-12">
             <div className="w-10 h-10 border-3 border-primary border-t-transparent rounded-full animate-spin" />
@@ -227,7 +227,7 @@ export default function AvisosPage() {
                       key={notification.id}
                       onClick={() => markAsRead(notification.id)}
                       className={cn(
-                        'notification-card relative rounded-[28px] p-5 flex items-start gap-4 z-10 cursor-pointer animate-fade-in-up',
+                        'notification-card relative rounded-[28px] p-5 tablet:p-6 flex items-start gap-4 z-10 cursor-pointer animate-fade-in-up',
                         notification.isRead
                           ? 'bg-white border border-slate-50'
                           : 'bg-lavender-soft'
@@ -282,7 +282,7 @@ export default function AvisosPage() {
                       key={notification.id}
                       onClick={() => markAsRead(notification.id)}
                       className={cn(
-                        'notification-card relative rounded-[28px] p-5 flex items-start gap-4 z-10 cursor-pointer animate-fade-in-up',
+                        'notification-card relative rounded-[28px] p-5 tablet:p-6 flex items-start gap-4 z-10 cursor-pointer animate-fade-in-up',
                         notification.isRead
                           ? 'bg-white border border-slate-50'
                           : 'bg-lavender-soft'
@@ -327,7 +327,7 @@ export default function AvisosPage() {
                       key={notification.id}
                       onClick={() => markAsRead(notification.id)}
                       className={cn(
-                        'notification-card relative rounded-[28px] p-5 flex items-start gap-4 z-10 cursor-pointer animate-fade-in-up',
+                        'notification-card relative rounded-[28px] p-5 tablet:p-6 flex items-start gap-4 z-10 cursor-pointer animate-fade-in-up',
                         notification.isRead
                           ? 'bg-white border border-slate-50'
                           : 'bg-lavender-soft'

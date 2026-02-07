@@ -33,7 +33,7 @@ export function LevelProgress({ variant = 'compact', className }: LevelProgressP
   }
 
   return (
-    <div className={cn('bg-gradient-to-br from-primary to-primary-dark rounded-3xl p-5 text-white', className)}>
+    <div className={cn('bg-gradient-to-br from-primary to-primary-dark rounded-3xl p-5 tablet:p-6 text-white', className)}>
       <div className="flex items-center gap-4 mb-4">
         <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center">
           <span className="text-3xl font-bold">{currentLevel}</span>

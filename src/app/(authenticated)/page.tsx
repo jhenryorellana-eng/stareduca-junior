@@ -115,7 +115,7 @@ export default function HomePage() {
   return (
     <div className="relative flex min-h-screen w-full flex-col overflow-x-hidden pb-24">
       {/* Header Section with Gradient */}
-      <header className="relative w-full bg-gradient-to-br from-[#090653] to-[#8B5CF6] px-5 pt-12 pb-8 rounded-b-[2rem] shadow-lg overflow-hidden">
+      <header className="relative w-full bg-gradient-to-br from-[#090653] to-[#8B5CF6] px-5 tablet:px-8 pt-12 pb-8 rounded-b-[2rem] shadow-lg overflow-hidden">
         {/* Decorative circles */}
         <div className="absolute top-0 right-0 -mr-16 -mt-16 h-64 w-64 rounded-full bg-white/5 blur-3xl" />
         <div className="absolute bottom-0 left-0 -ml-10 -mb-10 h-40 w-40 rounded-full bg-white/10 blur-2xl" />
@@ -154,7 +154,7 @@ export default function HomePage() {
         </div>
 
         {/* Stats Row */}
-        <div className="relative grid grid-cols-3 gap-3 z-10">
+        <div className="relative grid grid-cols-3 gap-3 tablet:gap-4 z-10">
           {/* XP Card */}
           <div className="stats-card">
             <span className="text-xl">⭐</span>
@@ -183,7 +183,7 @@ export default function HomePage() {
       </header>
 
       {/* Main Content Area */}
-      <main className="flex flex-col gap-6 px-5 pt-6">
+      <main className="flex flex-col gap-6 px-5 tablet:px-8 pt-6">
         {/* Level Progress Widget */}
         <div className="flex flex-col gap-3 rounded-2xl bg-white p-5 shadow-card animate-fade-in-up">
           <div className="flex items-end justify-between">
@@ -220,7 +220,7 @@ export default function HomePage() {
               </Link>
             </div>
             <div className="group relative flex flex-col overflow-hidden rounded-2xl bg-white shadow-card transition-all hover:shadow-card-hover">
-              <div className="relative h-36 w-full overflow-hidden">
+              <div className="relative h-36 tablet:h-44 w-full overflow-hidden">
                 {courseInProgress.thumbnailUrl ? (
                   <div
                     className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105"
@@ -265,14 +265,14 @@ export default function HomePage() {
         {recommendedCourses.length > 0 && (
           <div className="flex flex-col gap-3 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
             <h3 className="text-lg font-bold text-slate-900">Recomendado para ti</h3>
-            <div className="flex w-full snap-x snap-mandatory gap-4 overflow-x-auto pb-4 no-scrollbar -mx-5 px-5">
+            <div className="flex w-full snap-x snap-mandatory gap-4 overflow-x-auto pb-4 no-scrollbar -mx-5 px-5 tablet:-mx-8 tablet:px-8">
               {recommendedCourses.map((course) => (
                 <Link
                   key={course.id}
                   href={`/aprender/${course.id}`}
-                  className="min-w-[220px] max-w-[220px] snap-center rounded-2xl bg-white p-3 shadow-sm border border-gray-100 transition-all hover:shadow-card-hover hover:-translate-y-1"
+                  className="min-w-[220px] max-w-[220px] tablet:min-w-[260px] tablet:max-w-[260px] snap-center rounded-2xl bg-white p-3 shadow-sm border border-gray-100 transition-all hover:shadow-card-hover hover:-translate-y-1"
                 >
-                  <div className="relative mb-3 h-32 w-full overflow-hidden rounded-xl bg-gray-100">
+                  <div className="relative mb-3 h-32 tablet:h-36 w-full overflow-hidden rounded-xl bg-gray-100">
                     {course.thumbnailUrl ? (
                       <div
                         className="h-full w-full bg-cover bg-center"

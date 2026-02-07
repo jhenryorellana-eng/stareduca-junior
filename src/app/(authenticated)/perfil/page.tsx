@@ -98,7 +98,7 @@ export default function PerfilPage() {
   return (
     <div className="bg-background-light min-h-screen pb-24 relative overflow-x-hidden">
       {/* Top App Bar */}
-      <div className="sticky top-0 z-20 bg-background-light/95 backdrop-blur-md px-4 py-3 flex items-center justify-between">
+      <div className="sticky top-0 z-20 bg-background-light/95 backdrop-blur-md px-4 tablet:px-6 py-3 flex items-center justify-between">
         <h2 className="text-xl font-bold tracking-tight">Logros</h2>
         <button
           onClick={handleLogout}
@@ -109,7 +109,7 @@ export default function PerfilPage() {
       </div>
 
       {/* Hero Card: Level & XP */}
-      <div className="px-4 mt-2">
+      <div className="px-4 tablet:px-6 mt-2">
         <div className="relative w-full rounded-2xl overflow-hidden bg-gradient-to-br from-primary to-primary-dark shadow-xl shadow-primary/20 p-6 text-white animate-fade-in-up">
           {/* Decorative circle */}
           <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-2xl pointer-events-none" />
@@ -168,10 +168,10 @@ export default function PerfilPage() {
       </div>
 
       {/* Stats Section */}
-      <div className="px-4 mt-6 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-        <div className="grid grid-cols-3 gap-3">
+      <div className="px-4 tablet:px-6 mt-6 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+        <div className="grid grid-cols-3 gap-3 tablet:gap-4">
           {/* Streak */}
-          <div className="bg-white p-3 rounded-xl border border-slate-100 shadow-sm flex flex-col items-center justify-center gap-1 text-center">
+          <div className="bg-white p-3 tablet:p-4 rounded-xl border border-slate-100 shadow-sm flex flex-col items-center justify-center gap-1 text-center">
             <div className="w-8 h-8 rounded-full bg-orange-100 text-orange-500 flex items-center justify-center mb-1">
               <Icon name="local_fire_department" size={18} />
             </div>
@@ -179,7 +179,7 @@ export default function PerfilPage() {
             <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wide">Racha</p>
           </div>
           {/* Courses */}
-          <div className="bg-white p-3 rounded-xl border border-slate-100 shadow-sm flex flex-col items-center justify-center gap-1 text-center">
+          <div className="bg-white p-3 tablet:p-4 rounded-xl border border-slate-100 shadow-sm flex flex-col items-center justify-center gap-1 text-center">
             <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-500 flex items-center justify-center mb-1">
               <Icon name="menu_book" size={18} />
             </div>
@@ -187,7 +187,7 @@ export default function PerfilPage() {
             <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wide">Cursos</p>
           </div>
           {/* Time */}
-          <div className="bg-white p-3 rounded-xl border border-slate-100 shadow-sm flex flex-col items-center justify-center gap-1 text-center">
+          <div className="bg-white p-3 tablet:p-4 rounded-xl border border-slate-100 shadow-sm flex flex-col items-center justify-center gap-1 text-center">
             <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-500 flex items-center justify-center mb-1">
               <Icon name="schedule" size={18} />
             </div>
@@ -199,15 +199,15 @@ export default function PerfilPage() {
 
       {/* Badges Section */}
       <div className="mt-8 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-        <div className="px-4 flex items-center justify-between mb-4">
+        <div className="px-4 tablet:px-6 flex items-center justify-between mb-4">
           <h3 className="text-lg font-bold text-slate-900">Mis Insignias</h3>
           <span className="text-xs font-semibold text-primary bg-primary/10 px-2 py-1 rounded-md">
             {badges.length} / {totalCourses || badges.length}
           </span>
         </div>
-        <div className="px-4 pb-4">
+        <div className="px-4 tablet:px-6 pb-4">
           {/* 5 Column Grid */}
-          <div className="grid grid-cols-5 gap-3">
+          <div className="grid grid-cols-5 tablet:grid-cols-6 gap-3">
             {/* Earned Badges from store */}
             {badges.map((badge) => {
               const [colorFrom, colorTo] = (badge.color || '#fcd34d|#f59e0b').split('|');
@@ -240,7 +240,7 @@ export default function PerfilPage() {
       </div>
 
       {/* User Info Card */}
-      <div className="px-4 mt-4 animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
+      <div className="px-4 tablet:px-6 mt-4 animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
         <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
           <div className="flex items-center gap-3 mb-3">
             <Icon name="person" size={24} className="text-primary" />

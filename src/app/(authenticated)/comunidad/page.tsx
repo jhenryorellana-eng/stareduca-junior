@@ -228,7 +228,7 @@ export default function ComunidadPage() {
   return (
     <div className="bg-white min-h-screen relative flex flex-col overflow-x-hidden pb-24">
       {/* Sticky Header */}
-      <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-gray-100 px-4 py-3 flex items-center justify-between transition-colors duration-200">
+      <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-gray-100 px-4 tablet:px-6 py-3 flex items-center justify-between transition-colors duration-200">
         <h1 className="text-xl font-bold tracking-tight text-slate-900">Comunidad</h1>
         <button
           onClick={openCreateModal}
@@ -240,7 +240,7 @@ export default function ComunidadPage() {
       </header>
 
       {/* Main Feed Content */}
-      <main className="flex flex-col gap-4 p-4 w-full max-w-md mx-auto">
+      <main className="flex flex-col gap-4 p-4 tablet:px-6 w-full max-w-md tablet:max-w-2xl mx-auto">
         {/* Initial loading */}
         {isLoading && posts.length === 0 && (
           <div className="flex flex-col items-center justify-center py-16">

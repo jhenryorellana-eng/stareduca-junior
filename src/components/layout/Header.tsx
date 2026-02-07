@@ -39,7 +39,7 @@ export function Header({
         className
       )}
     >
-      <div className="flex items-center justify-between h-14 px-4">
+      <div className="flex items-center justify-between h-14 tablet:h-16 px-4 tablet:px-6">
         <div className="flex items-center gap-3">
           {(showBack || isInWebView) && (
             <button
@@ -50,7 +50,7 @@ export function Header({
             </button>
           )}
           {title && (
-            <h1 className="text-lg font-bold text-secondary">{title}</h1>
+            <h1 className="text-lg tablet:text-xl font-bold text-secondary">{title}</h1>
           )}
         </div>
 

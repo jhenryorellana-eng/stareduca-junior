@@ -318,11 +318,11 @@ export default function CourseDetailPage() {
   }
 
   return (
-    <div className="bg-white min-h-screen flex flex-col max-w-md mx-auto">
+    <div className="bg-white min-h-screen flex flex-col max-w-md tablet:max-w-2xl mx-auto">
       {/* Hero Section with Course Image */}
       <div className="px-4 pt-2 pb-4">
         <div
-          className="w-full h-56 rounded-2xl bg-cover bg-center shadow-lg relative overflow-hidden"
+          className="w-full h-56 tablet:h-64 rounded-2xl bg-cover bg-center shadow-lg relative overflow-hidden"
           style={{
             backgroundImage: course.thumbnail_url ? `url('${course.thumbnail_url}')` : undefined,
           }}
@@ -361,16 +361,16 @@ export default function CourseDetailPage() {
         )}
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-3 gap-3 mb-6">
-          <div className="flex flex-col items-center justify-center p-3 rounded-xl bg-slate-100">
+        <div className="grid grid-cols-3 gap-3 tablet:gap-4 mb-6">
+          <div className="flex flex-col items-center justify-center p-3 tablet:p-4 rounded-xl bg-slate-100">
             <span className="text-lg font-bold text-slate-900">{totalLessons}</span>
             <span className="text-xs text-slate-500">Capítulos</span>
           </div>
-          <div className="flex flex-col items-center justify-center p-3 rounded-xl bg-slate-100">
+          <div className="flex flex-col items-center justify-center p-3 tablet:p-4 rounded-xl bg-slate-100">
             <span className="text-lg font-bold text-slate-900">{formatDuration(totalDuration)}</span>
             <span className="text-xs text-slate-500">Duración</span>
           </div>
-          <div className="flex flex-col items-center justify-center p-3 rounded-xl bg-primary/10 border border-primary/20">
+          <div className="flex flex-col items-center justify-center p-3 tablet:p-4 rounded-xl bg-primary/10 border border-primary/20">
             <span className="text-lg font-bold text-primary">+{course.xp_reward}</span>
             <span className="text-xs text-primary/80 font-medium">XP Reward</span>
           </div>
@@ -420,7 +420,7 @@ export default function CourseDetailPage() {
                     onClick={() => isModuleUnlocked && toggleModule(module.id)}
                     disabled={!isModuleUnlocked}
                     className={cn(
-                      'w-full flex items-center justify-between p-4 rounded-2xl transition-all',
+                      'w-full flex items-center justify-between p-4 tablet:p-5 rounded-2xl transition-all',
                       isModuleUnlocked
                         ? 'bg-slate-100 hover:bg-slate-200 cursor-pointer'
                         : 'bg-slate-50 cursor-not-allowed opacity-60'
@@ -591,7 +591,7 @@ export default function CourseDetailPage() {
 
       {/* Sticky Bottom CTA */}
       {totalLessons > 0 && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-t border-slate-100 px-5 py-4 z-20 max-w-md mx-auto">
+        <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-t border-slate-100 px-5 py-4 z-20 max-w-md tablet:max-w-2xl mx-auto">
           {!allLessonsCompleted && currentLessonInfo ? (
             <Link
               href={`/aprender/${courseId}/capitulo/${currentLessonInfo.lesson.id}`}

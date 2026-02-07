@@ -35,7 +35,7 @@ export function PostCard({
       style={{ animationDelay: `${animationDelay}s` }}
     >
       {/* Header */}
-      <div className="flex items-center justify-between p-4 pb-2">
+      <div className="flex items-center justify-between p-4 tablet:p-5 pb-2 tablet:pb-3">
         <div className="flex items-center gap-3">
           <Avatar
             src={author.avatarUrl}
@@ -71,7 +71,7 @@ export function PostCard({
       </div>
 
       {/* Body Text */}
-      <div className="px-4 py-1">
+      <div className="px-4 tablet:px-5 py-1">
         <p className="text-sm text-slate-800 leading-relaxed whitespace-pre-wrap">{content}</p>
       </div>
 
@@ -86,7 +86,7 @@ export function PostCard({
       )}
 
       {/* Reaction Bar */}
-      <div className="px-4 py-3 border-t border-gray-50">
+      <div className="px-4 tablet:px-5 py-3 border-t border-gray-50">
         <div className="flex items-center justify-between">
           {/* Reactions Cluster */}
           <button

@@ -147,7 +147,7 @@ export default function AprenderPage() {
     <div className="bg-white min-h-screen flex flex-col overflow-x-hidden pb-24">
       {/* Top App Bar */}
       <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-100 px-4 pt-2 pb-2">
-        <div className="flex items-center justify-between h-14 w-full max-w-md mx-auto">
+        <div className="flex items-center justify-between h-14 tablet:h-16 w-full max-w-md tablet:max-w-2xl mx-auto">
           {/* Left: Avatar */}
           <div className="flex shrink-0 items-center">
             <div className="relative">
@@ -186,7 +186,7 @@ export default function AprenderPage() {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 w-full max-w-md mx-auto flex flex-col">
+      <main className="flex-1 w-full max-w-md tablet:max-w-2xl mx-auto flex flex-col">
         {/* Tabs */}
         <div className="px-4 py-4 bg-white">
           <div className="flex p-1 bg-slate-100 rounded-xl">
@@ -227,7 +227,7 @@ export default function AprenderPage() {
         </div>
 
         {/* Course List */}
-        <div className="flex flex-col px-4 gap-4 mt-2">
+        <div className="flex flex-col px-4 tablet:px-6 gap-4 mt-2">
           {isLoading ? (
             <div className="flex flex-col items-center justify-center py-12">
               <div className="w-10 h-10 border-3 border-primary border-t-transparent rounded-full animate-spin" />
@@ -246,7 +246,7 @@ export default function AprenderPage() {
                     {/* Thumbnail */}
                     <div className="shrink-0 relative">
                       <div
-                        className="bg-center bg-no-repeat bg-cover rounded-xl w-[100px] h-[100px] bg-slate-200"
+                        className="bg-center bg-no-repeat bg-cover rounded-xl w-[100px] h-[100px] tablet:w-[120px] tablet:h-[120px] bg-slate-200"
                         style={{ backgroundImage: course.thumbnail_url ? `url('${course.thumbnail_url}')` : undefined }}
                       >
                         {!course.thumbnail_url && (
@@ -276,7 +276,7 @@ export default function AprenderPage() {
                         )}>
                           {getCategoryLabel(course.category)}
                         </span>
-                        <h3 className="text-slate-900 text-base font-bold leading-tight mb-1">
+                        <h3 className="text-slate-900 text-base tablet:text-lg font-bold leading-tight mb-1">
                           {course.title}
                         </h3>
                         <p className="text-slate-500 text-xs font-medium flex items-center gap-1">

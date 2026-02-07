@@ -525,7 +525,7 @@ export default function ChapterPlayerPage() {
   }
 
   return (
-    <div className="bg-white min-h-screen flex flex-col max-w-md mx-auto">
+    <div className="bg-white min-h-screen flex flex-col max-w-md tablet:max-w-2xl mx-auto">
       {/* Dark Header Area with Video */}
       <div className="bg-slate-900 pb-2 relative z-10 rounded-b-xl">
         {/* Top App Bar */}
@@ -716,9 +716,9 @@ export default function ChapterPlayerPage() {
       {/* Main Content */}
       <div className="flex-1 overflow-y-auto pb-28">
         {/* Lesson Header */}
-        <div className="px-5 pt-6 pb-2">
+        <div className="px-5 tablet:px-6 pt-6 pb-2">
           <div className="flex items-start justify-between gap-4">
-            <h1 className="text-slate-900 text-2xl font-bold leading-tight">{chapter.title}</h1>
+            <h1 className="text-slate-900 text-2xl tablet:text-3xl font-bold leading-tight">{chapter.title}</h1>
             <button className="text-primary shrink-0 mt-1">
               <Icon name="bookmark" size={24} />
             </button>
@@ -754,7 +754,7 @@ export default function ChapterPlayerPage() {
 
         {/* Materials Section */}
         {materials.length > 0 && (
-          <div className="px-5 mt-2">
+          <div className="px-5 tablet:px-6 mt-2">
             <h3 className="text-slate-900 text-lg font-bold mb-3">Materiales de este capitulo</h3>
             <div className="flex flex-col gap-3">
               {materials.map((material) => (
@@ -787,7 +787,7 @@ export default function ChapterPlayerPage() {
       </div>
 
       {/* Sticky Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-100 px-5 py-4 z-20 max-w-md mx-auto">
+      <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-100 px-5 tablet:px-6 py-4 z-20 max-w-md tablet:max-w-2xl mx-auto">
         <div className="flex items-center gap-4">
           {prevChapter ? (
             <Link

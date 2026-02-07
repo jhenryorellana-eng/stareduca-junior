@@ -111,7 +111,7 @@ export function CommentSheet({
 
       {/* Sheet */}
       <div
-        className="relative bg-white rounded-t-2xl shadow-xl animate-slide-up max-h-[80vh] flex flex-col"
+        className="relative bg-white rounded-t-2xl shadow-xl animate-slide-up max-h-[80vh] flex flex-col tablet:max-w-2xl tablet:mx-auto tablet:w-full"
         style={{
           transform: `translateY(${currentY}px)`,
           transition: isDragging ? 'none' : 'transform 0.2s',

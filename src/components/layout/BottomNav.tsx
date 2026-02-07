@@ -30,7 +30,7 @@ export function BottomNav() {
       "fixed bottom-0 left-0 right-0 z-50 rounded-t-4xl bg-white shadow-[0_-4px_20px_rgba(0,0,0,0.05)] border-t border-gray-100",
       !isInWebView && "pb-[env(safe-area-inset-bottom)]"
     )}>
-      <div className="flex h-20 w-full items-center justify-around px-2 pb-2">
+      <div className="flex h-20 w-full items-center justify-around px-2 tablet:px-8 pb-2">
         {tabs.map((tab) => {
           const active = isActive(tab.href);
           const showBadge = tab.href === '/avisos' && unreadCount > 0;
@@ -55,7 +55,7 @@ export function BottomNav() {
                   <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-red-500 rounded-full border border-white" />
                 )}
               </div>
-              <span className={cn('text-[10px]', active ? 'font-bold' : 'font-medium')}>
+              <span className={cn('text-[10px] tablet:text-xs', active ? 'font-bold' : 'font-medium')}>
                 {tab.name}
               </span>
             </Link>
