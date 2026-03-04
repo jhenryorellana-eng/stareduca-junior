@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { getAuthFromRequest, unauthorizedResponse } from '@/lib/auth';
+import { sendIndividualPush } from '@/lib/push-notifications';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
@@ -301,6 +302,17 @@ export async function POST(request: NextRequest) {
           data: { level: newLevel, previousLevel: oldLevel, levelName: getLevelName(newLevel) },
           is_read: false,
         });
+
+      // Send push notification for level up
+      if (auth.external_id) {
+        sendIndividualPush(
+          auth.external_id,
+          'level_up',
+          '¡Subiste de nivel!',
+          `¡Felicidades! Ahora eres ${getLevelName(newLevel)} (Nivel ${newLevel})`,
+          { level: newLevel, previousLevel: oldLevel }
+        ).catch(console.error);
+      }
     }
   }
 
@@ -353,6 +365,17 @@ export async function POST(request: NextRequest) {
             data: { badge_icon: examData.badge_icon, badge_name: examData.badge_name },
             is_read: false,
           });
+
+        // Send push notification for badge earned
+        if (auth.external_id) {
+          sendIndividualPush(
+            auth.external_id,
+            'badge_earned',
+            '¡Nueva Insignia!',
+            `Has ganado la insignia "${examData.badge_name}"`,
+            { badge_icon: examData.badge_icon, badge_name: examData.badge_name }
+          ).catch(console.error);
+        }
       }
     }
   }

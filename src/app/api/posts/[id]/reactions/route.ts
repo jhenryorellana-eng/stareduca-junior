@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createUntypedServerClient } from '@/lib/supabase/server';
 import { getAuthFromRequest, unauthorizedResponse } from '@/lib/auth';
 import { getLevelTitle } from '@/lib/utils';
+import { sendIndividualPush } from '@/lib/push-notifications';
 import type { ReactionDetail, ReactionSummary, ReactionType } from '@/types';
 
 const VALID_REACTION_TYPES: ReactionType[] = ['like', 'heart', 'idea', 'party'];
@@ -178,6 +179,23 @@ export async function POST(
         message: `${firstName} ${lastName} reaccionó a tu publicación`,
         data: { postId, reactionType: type },
       });
+
+      // Send push notification to post owner's device
+      const { data: postOwner } = await supabase
+        .from('students')
+        .select('external_id')
+        .eq('id', post.student_id)
+        .single();
+
+      if (postOwner?.external_id) {
+        sendIndividualPush(
+          postOwner.external_id,
+          'reaction',
+          'Nueva reacción',
+          `${firstName} ${lastName} reaccionó a tu publicación`,
+          { postId, reactionType: type }
+        ).catch(console.error);
+      }
     }
   }
 

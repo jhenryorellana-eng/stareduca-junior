@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient, createUntypedServerClient } from '@/lib/supabase/server';
 import { getAuthFromRequest, unauthorizedResponse } from '@/lib/auth';
 import { getLevelTitle } from '@/lib/utils';
+import { sendIndividualPush } from '@/lib/push-notifications';
 import type { CommunityComment } from '@/types';
 
 const COMMENTS_PER_PAGE = 20;
@@ -185,6 +186,23 @@ export async function POST(
       message: `${firstName} ${lastName} comentó en tu publicación`,
       data: { postId, commentId: newComment.id },
     });
+
+    // Send push notification to post owner's device
+    const { data: postOwner } = await supabase
+      .from('students')
+      .select('external_id')
+      .eq('id', post.student_id)
+      .single();
+
+    if (postOwner?.external_id) {
+      sendIndividualPush(
+        postOwner.external_id,
+        'comment',
+        'Nuevo comentario',
+        `${firstName} ${lastName} comentó en tu publicación`,
+        { postId, commentId: newComment.id }
+      ).catch(console.error);
+    }
   }
 
   return NextResponse.json({ comment }, { status: 201 });
