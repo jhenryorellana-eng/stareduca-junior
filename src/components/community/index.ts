@@ -4,3 +4,5 @@ export { PostOptionsMenu } from './PostOptionsMenu';
 export { ReactionPicker } from './ReactionPicker';
 export { ReactionDetails } from './ReactionDetails';
 export { CommentSheet } from './CommentSheet';
+export { ReportModal } from './ReportModal';
+export { TermsGate } from './TermsGate';

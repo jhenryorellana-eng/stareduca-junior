@@ -54,6 +54,9 @@ interface CommunityState {
   closeReactionDetails: () => void;
   setReactionDetailsFilter: (filter: ReactionType | 'all') => void;
 
+  // Moderation
+  removePostsByAuthor: (authorId: string) => void;
+
   // Reset
   reset: () => void;
 }
@@ -444,6 +447,12 @@ export const useCommunityStore = create<CommunityState>((set, get) => ({
   }),
 
   setReactionDetailsFilter: (filter) => set({ reactionDetailsFilter: filter }),
+
+  removePostsByAuthor: (authorId: string) => {
+    set((state) => ({
+      posts: state.posts.filter((p) => p.author.id !== authorId),
+    }));
+  },
 
   reset: () => set(initialState),
 }));

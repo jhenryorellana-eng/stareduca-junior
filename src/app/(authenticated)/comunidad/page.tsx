@@ -11,6 +11,8 @@ import {
   ReactionPicker,
   ReactionDetails,
   CommentSheet,
+  ReportModal,
+  TermsGate,
 } from '@/components/community';
 import type { CommunityPost, ReactionType } from '@/types';
 import { Icon } from '@/components/ui/Icon';
@@ -69,13 +71,34 @@ export default function ComunidadPage() {
   } | null>(null);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [reportPostId, setReportPostId] = useState<string | null>(null);
+  const [termsAccepted, setTermsAccepted] = useState<boolean | null>(null);
 
-  // Initial fetch
+  // Check terms acceptance
   useEffect(() => {
-    if (token && !authLoading) {
+    async function checkTerms() {
+      if (!token || authLoading) return;
+      try {
+        const response = await fetch('/api/terms', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setTermsAccepted(data.accepted);
+        }
+      } catch {
+        setTermsAccepted(false);
+      }
+    }
+    checkTerms();
+  }, [token, authLoading]);
+
+  // Initial fetch (only after terms accepted)
+  useEffect(() => {
+    if (token && !authLoading && termsAccepted) {
       fetchPosts(token, true);
     }
-  }, [token, authLoading, fetchPosts]);
+  }, [token, authLoading, termsAccepted, fetchPosts]);
 
   // Infinite scroll
   const loadMore = useCallback(() => {
@@ -140,6 +163,27 @@ export default function ComunidadPage() {
   const handleDeletePost = async () => {
     if (optionsMenu && token) {
       await deletePost(token, optionsMenu.postId);
+    }
+  };
+
+  const handleReportClick = (postId: string) => {
+    setReportPostId(postId);
+  };
+
+  const handleBlockClick = async (userId: string) => {
+    if (!token || !confirm('¿Bloquear a este usuario? Ya no veras sus publicaciones.')) return;
+
+    try {
+      const response = await fetch(`/api/users/${userId}/block`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (response.ok) {
+        // Remove blocked user's posts from feed
+        useCommunityStore.getState().removePostsByAuthor(userId);
+      }
+    } catch (error) {
+      console.error('Error blocking user:', error);
     }
   };
 
@@ -217,12 +261,16 @@ export default function ComunidadPage() {
     ? posts.find((p) => p.id === reactionPickerPostId)
     : null;
 
-  if (authLoading) {
+  if (authLoading || termsAccepted === null) {
     return (
       <div className="bg-white min-h-screen flex items-center justify-center">
         <Icon name="progress_activity" size={48} className="animate-spin text-primary" />
       </div>
     );
+  }
+
+  if (termsAccepted === false) {
+    return <TermsGate onAccepted={() => setTermsAccepted(true)} />;
   }
 
   return (
@@ -275,6 +323,8 @@ export default function ComunidadPage() {
             onReactionLongPress={handleReactionLongPress}
             onCommentClick={handleCommentClick}
             onOptionsClick={handleOptionsClick}
+            onReportClick={handleReportClick}
+            onBlockClick={handleBlockClick}
             animationDelay={index * 0.05}
           />
         ))}
@@ -303,6 +353,14 @@ export default function ComunidadPage() {
           </div>
         )}
       </main>
+
+      {/* Report Modal */}
+      {reportPostId && (
+        <ReportModal
+          postId={reportPostId}
+          onClose={() => setReportPostId(null)}
+        />
+      )}
 
       {/* Modals and Overlays */}
       <CreatePostModal

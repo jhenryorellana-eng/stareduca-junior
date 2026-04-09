@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { cn, formatRelativeTime, getLevelColor, getLevelTitle, REACTION_ICONS } from '@/lib/utils';
 import { Avatar } from '@/components/ui/Avatar';
 import { Icon } from '@/components/ui/Icon';
@@ -11,6 +12,8 @@ interface PostCardProps {
   onReactionLongPress: (postId: string) => void;
   onCommentClick: (postId: string) => void;
   onOptionsClick: (postId: string, event: React.MouseEvent) => void;
+  onReportClick?: (postId: string) => void;
+  onBlockClick?: (userId: string) => void;
   animationDelay?: number;
 }
 
@@ -20,8 +23,11 @@ export function PostCard({
   onReactionLongPress,
   onCommentClick,
   onOptionsClick,
+  onReportClick,
+  onBlockClick,
   animationDelay = 0,
 }: PostCardProps) {
+  const [showMenu, setShowMenu] = useState(false);
   const { author, content, imageUrl, reactionSummary, userReaction, commentCount, createdAt, isOwnPost } = post;
 
   // Get active reaction icons (those with count > 0)
@@ -59,15 +65,52 @@ export function PostCard({
             <p className="text-xs text-slate-500">{formatRelativeTime(createdAt)}</p>
           </div>
         </div>
-        {isOwnPost && (
+        <div className="relative">
           <button
-            onClick={(e) => onOptionsClick(post.id, e)}
+            onClick={(e) => {
+              if (isOwnPost) {
+                onOptionsClick(post.id, e);
+              } else {
+                setShowMenu(!showMenu);
+              }
+            }}
             className="text-slate-400 hover:text-slate-600 rounded-full p-1 transition-colors"
             aria-label="Opciones del post"
           >
             <Icon name="more_horiz" size={20} />
           </button>
-        )}
+          {showMenu && !isOwnPost && (
+            <>
+              <div
+                className="fixed inset-0 z-10"
+                onClick={() => setShowMenu(false)}
+              />
+              <div className="absolute right-0 top-full mt-1 bg-white rounded-xl shadow-xl border border-gray-100 py-1 z-20 min-w-[160px] animate-scale-in">
+                <button
+                  onClick={() => {
+                    setShowMenu(false);
+                    onReportClick?.(post.id);
+                  }}
+                  className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-gray-50 transition-colors"
+                >
+                  <Icon name="flag" size={18} />
+                  Reportar
+                </button>
+                <div className="border-t border-gray-100 my-1" />
+                <button
+                  onClick={() => {
+                    setShowMenu(false);
+                    if (author.id) onBlockClick?.(author.id);
+                  }}
+                  className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 transition-colors"
+                >
+                  <Icon name="block" size={18} />
+                  Bloquear usuario
+                </button>
+              </div>
+            </>
+          )}
+        </div>
       </div>
 
       {/* Body Text */}
